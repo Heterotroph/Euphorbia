@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Казахстанская Рекламная сеть - AdBox{% endblock %}
+
+{% block css %}
+    <script src="/static/js/libs/angular/angular.min.js"></script>
+    <script src="/static/js/libs/angular/loading-bar.min.js"></script>
+    <link href="/static/js/libs/angular/loading-bar.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+
+    <section ng-app="siteApp">
+        <div class="container">
+            <div class="row">
+                </br>
+            </div>
+        </div>
+        <div class="container" ng-controller="RegisterCtrl">
+            <div class="row">
+                <div class="col-md-4 col-sm-4 hero-feature">
+                    <div class="thumbnail">
+                        <div class="caption">
+                            <h3>Чтобы начать сотрудничество, заполните эту заявку →
+                                или свяжитесь с отделом продаж
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-6 hero-feature">
+                    <div class="alert alert-success" ng-show="showSuccess" ng-init="showSuccess=false;">
+                        <button type="button" class="close" ng-click="showSuccess=false;" aria-hidden="true">×</button>
+                        <strong>[[message]]</strong>
+                    </div>
+                    <div class="alert alert-danger" ng-show="showError" ng-init="showError=false;">
+                        <button type="button" class="close" ng-click="showError=false;" aria-hidden="true">×</button>
+                        <strong>[[message]]</strong>
+                    </div>
+                    <form class="form-horizontal" action="register" method="post" name="userForm" novalidate>
+                        <div>
+                            <h4>Заявка на регистрацию сайта</h4>
+                            <ul class="nav nav-tabs">
+                                <li data-ng-repeat=" st in steps" ng-class="{active: $index==getCurrentStepIndex()}">
+                                    <a href="javascript:void(0)" ng-click="goToStep($index)">[[ st ]]</a>
+                                </li>
+                            </ul>
+                            <div ng-switch on="selection">
+
+                                <!-- First Step -->
+                                <div ng-switch-when="Шаг 1: Сайт">
+                                        <div>
+                                            <div class="form-group-lg required">
+                                                <label class="control-label" for="teamName">Название сайта</label>
+
+                                                <input class="form-control" type="text" name="teamName" ng-model="formData.site_name" ng-minlength="3" placeholder="Название сайта" required >
+
+                                            </div>
+                                            <div class="form-group-lg required">
+                                                <label class="control-label" for="inputURL">URL сайта</label>
+
+                                                <input  class="form-control" type="url" name="inputURL" ng-model="formData.url" ng-minlength="3" placeholder="URL сайта" required>
+
+                                            </div>
+                                            <div class="form-group-lg">
+                                                <label class="control-label" for="inputPassword">Ссылка на независимую
+                                                    статистику</label>
+
+                                                <input class="form-control" type="text" name="inputPassword" ng-model="formData.stat"
+                                                       placeholder="Cтатистика">
+
+                                            </div>
+
+                                        </div>
+                                </div>
+
+                                <!-- Second Step -->
+                                <div ng-switch-when="Шаг 2: Контакты">
+                                    <div class="span4">
+                                        <div class="form-group-lg required">
+                                            <label class="control-label required" for="FIO">Ваше имя</label>
+
+                                            <input  class="form-control" type="text" name="FIO" ng-model="formData.name" placeholder="Ваше имя" required>
+
+                                        </div>
+
+                                        <div class="form-group-lg required">
+                                            <label class="control-label required" for="inputPhone">Телефон</label>
+
+                                            <input  class="form-control" type="text" name="inputPhone" ng-model="formData.telephone" placeholder="Телефон" required>
+
+                                        </div>
+
+                                        <div class="form-group-lg required">
+                                            <label class="control-label" for="inputEmail">Электронная почта</label>
+
+                                            <input  class="form-control" type="email" name="inputEmail" ng-model="formData.email"  placeholder="Электронная почта" required>
+
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <button  style="margin:20px 0;" type="submit" class="btn btn-success">Отправить</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Third Step -->
+    {#                            <div ng-switch-when="Шаг 3: Отправить">#}
+    {#                                <div class="form-group">#}
+    {#                                    <label class="control-label required" for="inputLoginAd">Логин в AdRiver (если#}
+    {#                                        есть)</label>#}
+    {##}
+    {#                                    <div class="controls">#}
+    {#                                        <input id="inputLoginAd" ng-model="formData.adriver_id" type="text">#}
+    {#                                    </div>#}
+    {#                                </div>#}
+    {##}
+    {#                                <div class="form-group">#}
+    {#                                    <label class="control-label" for="sourceType">Что привело Вас на наш сайт?</label>#}
+    {##}
+    {#                                    <div class="controls">#}
+    {#                                        <input type="text" id="sourceType" ng-model="formData.question" placeholder="Что привело Вас на наш сайт? ">#}
+    {#                                    </div>#}
+    {#                                </div>#}
+    {#                                #}
+    {#                            </div>#}
+                            </div>
+                            <div class="clearfix"></div>
+                            <ul class="pager" style="text-align: center;">
+{#                                <li class="" ng-class="{disabled: !hasPreviousStep()}" ng-show="hasPreviousStep()">#}
+{#                                    <a href="javascript:void(0);" ng-click="decrementStep()">&larr; Пред. Шаг</a>#}
+{#                                </li>#}
+                                <li class="" ng-class="{disabled: !hasNextStep()}">
+                                    <a href="javascript:void(0);" ng-click="incrementStep()" ng-show="hasNextStep()">Следующий Шаг &rarr;</a>
+                                </li>
+                            </ul>
+
+                            <div class="clearfix"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
+
+{% block js %}
+
+    <script src="/static/js/libs/underscore-min.js"></script>
+    <script src="/static/js/angular_site/app.js"></script>
+    <script src="/static/js/angular_site/controllers/RegisterCtrl.js"></script>
+{% endblock %}

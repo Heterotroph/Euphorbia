@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Welcome to Django{% endblock %}
+{% block head %}Welcome to Django{% endblock %}
+{% block content %}
+    <section style="padding-left: 15%;">
+    <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+    <span></span> <b class="caret"></b>
+    </div>
+
+<script type="text/javascript">
+$(function() {
+
+    $('#reportrange span').html(moment("{{ date_from }}").format('MMMM D, YYYY') + ' - ' + moment("{{ date_to }}").format('MMMM D, YYYY'));
+
+    $('#reportrange').daterangepicker({
+        format: 'MM/DD/YYYY',
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment(),
+        minDate: '01/01/2012',
+        maxDate: '12/31/2015',
+        showDropdowns: true,
+        showWeekNumbers: true,
+        timePicker: false,
+        timePickerIncrement: 1,
+        timePicker12Hour: true,
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        opens: 'left',
+        drops: 'down',
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-primary',
+        cancelClass: 'btn-default',
+        separator: ' to ',
+        locale: {
+            applyLabel: 'Submit',
+            cancelLabel: 'Cancel',
+            fromLabel: 'From',
+            toLabel: 'To',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr','Sa'],
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            firstDay: 1
+        }
+    }, function(start, end, label) {
+        window.location.replace('?start='+start.format('YYYY-MM-DD')+'&end='+end.format('YYYY-MM-DD'));
+        console.log(start.toISOString(), end.toISOString(), label);
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    });
+
+});
+</script>
+    <h1>Первый Сайт</h1>
+    <table style="margin: auto auto;"
+        <table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Просмотров</th>
+            <th>Кликов</th>
+            <th>Денег</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Верхний</td>
+            <td>10</td>
+            <td>2</td>
+            <td>0.02$</td>
+        </tr>
+       <tr>
+            <td>2</td>
+            <td>Левый</td>
+            <td>10</td>
+            <td>2</td>
+            <td>0.02$</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Нихний</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0.01$</td>
+        </tr>
+        <tr class="active">
+            <td colspan="2">Итого</td>
+            <td>21</td>
+            <td>5</td>
+            <td>0.05$</td>
+        </tr>
+    </tbody>
+</table>
+    <h1>Второй Сайт</h1>
+    <table style="margin: auto auto;"
+        <table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Просмотров</th>
+            <th>Кликов</th>
+            <th>Денег</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1</td>
+            <td>Верхний</td>
+            <td>10</td>
+            <td>2</td>
+            <td>0.02$</td>
+        </tr>
+       <tr>
+            <td>2</td>
+            <td>Левый</td>
+            <td>10</td>
+            <td>2</td>
+            <td>0.02$</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>Нихний</td>
+            <td>1</td>
+            <td>1</td>
+            <td>0.01$</td>
+        </tr>
+        <tr class="active">
+            <td colspan="2">Итого</td>
+            <td>21</td>
+            <td>5</td>
+            <td>0.05$</td>
+        </tr>
+    </tbody>
+</table>
+    <br>
+    <button class="btn btn-primary">Запросить еще баннер</button>
+    </section>
+{% endblock %}

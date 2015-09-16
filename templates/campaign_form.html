@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Welcome to Django{% endblock %}
+{% block head %}Welcome to Django{% endblock %}
+{% block css %}
+{% load humanize %}
+
+
+{% endblock %}
+{% block content %}
+    <section style="padding-left: 15%;">
+    <h1>Отправить заявку на создание кампании</h1>
+    <form action="/campaign/new/" method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="fieldWrapper">
+            {{ form.campaign_name.errors }}
+            <label for="id_campaign_name">Название кампании:</label><br>
+            {{ form.campaign_name }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.campaign_text.errors }}
+            <label for="id_campaign_text">Описание кампании:</label><br>
+            {{ form.campaign_text }}
+        </div>
+        <input type="submit" value="Отправить" class="btn btn-primary" />
+    </form>
+    </section>
+{% endblock %}

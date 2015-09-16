@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Казахстанская Рекламная сеть - AdBox{% endblock %}
+
+{% block content %}
+
+
+    <!-- Header -->
+    <section id="carousel">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+                      <!-- Indicators -->
+                      <ol class="carousel-indicators">
+                        <li data-target="#carousel-example-generic" data-slide-to="0" class="active"></li>
+                        <li data-target="#carousel-example-generic" data-slide-to="1"></li>
+                        <li data-target="#carousel-example-generic" data-slide-to="2"></li>
+                      </ol>
+
+                      <!-- Wrapper for slides -->
+                      <div class="carousel-inner">
+                        <div class="item active">
+                          <img class="img-responsive" src="/static/bs/img/carousel/dl_aop.png" alt="...">
+                          <div class="carousel-caption">
+
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Controls -->
+                      <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+{#                        <span class="glyphicon glyphicon-chevron-left"></span>#}
+                      </a>
+                      <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+{#                        <span class="glyphicon glyphicon-chevron-right"></span>#}
+                      </a>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Grid Section -->
+    <section id="portfolio">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 col-sm-6 hero-feature">
+                    <div class="thumbnail">
+                        <div class="caption">
+{#                            <h6>Tell your finance department to limber up</h6>#}
+                            <h1 class="text-center">РЕКЛАМАДАТЕЛЯМ</h1>
+
+                            <p>Казахстанская Рекламная сеть - AdBox предлагает своим рекламодателям ряд рекламных продуктов, каждый из которых предназначен для решения задач определенного сегмента.
+Если ваши товары и услуги рассчитаны на широкую аудиторию, то вам лучше всего подойдут продукты «Максимальный охват» и «Региональные сайты».</p>
+                            <h6>
+                            </br>
+                            <div class="text-center">
+                                <a href="/advertizer/register" class="btn btn-info">Хочу разместить рекламу</a>
+                            </div>
+                            </h6>
+                            </br>
+                            </br>
+                        </div>
+                    </div>
+                </div>
+
+               <div class="col-md-6 col-sm-6 hero-feature">
+                    <div class="thumbnail">
+                        <div class="caption">
+{#                            <h6>Alchemy for your invertory</h6>#}
+                            <h1 class="text-center">ВЕБМАСТЕРАМ</h1>
+
+                            <p>Казахстанская Рекламная сеть - AdBox предоставляет вам возможность увеличения дохода от медийной рекламы на вашем сайте. Размещение рекламы на сайте происходит без потери контроля, но с экономией вашего времени. Система доступна крупным и небольшим сайтам с качественной аудиторией. Мы предлагаем выбор самых востребованных форматов и таргетингов.</p>
+                            </br>
+                            <h6>
+                                <div class="text-center">
+                                    <a href="/publisher/register" class="btn btn-warning">Хочу монетезировать сайт</a>
+                                </div>
+                            </h6>
+                            </br>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h2>О Нас</h2>
+                    </br>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 col-lg-offset-2">
+                    <p>Казахстанская Рекламная сеть - AdBox является рекламным инвентарем для рекламодателей и издателей по решению задач каждого.
+Для издателей, мы предоставляем качественные рекламные объявления от ведущих брендов.<p>
+                    <p>Различные модели ценообразования, позволяют эффективного монетизировать онлайн-контент и получать высокий доход.</p>
+                </div>
+                <div class="col-lg-4 col-lg">
+                    <p>Для рекламодателей, мы предлагаем обширный охват целевой аудитории. С помощью современных рекламных технологий мы способны добиваться максимального эффекта и рентабельно преобразовывать поток пользователей.</p>
+                    <p>Для сотрудничества с AdBox, не надо заранее бронировать рекламные места. У нас всегда есть возможность быстро настроить и запустить рекламную кампанию.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+{% endblock %}

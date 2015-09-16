@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Welcome to Django{% endblock %}
+{% block head %}Welcome to Django{% endblock %}
+{% block css %}
+{% load humanize %}
+
+
+{% endblock %}
+{% block content %}
+    <section style="padding-left: 15%;">
+    <h1>Отправить заявку на создание баннера</h1>
+    <form action="/banner/new/" method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="fieldWrapper">
+            {{ form.site_url.errors }}
+            <label for="id_site_url">URL сайта:</label><br>
+            {{ form.site_url }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.banner_format.errors }}
+            <label for="id_banner_format">Формат баннера:</label><br>
+            {{ form.banner_format }}
+        </div>
+        <input type="submit" value="Отправить" class="btn btn-primary" />
+    </form>
+    </section>
+{% endblock %}

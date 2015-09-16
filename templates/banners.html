@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Welcome to Django{% endblock %}
+{% block head %}Welcome to Django{% endblock %}
+{% block css %}
+{% load humanize %}
+
+
+{% endblock %}
+{% block content %}
+    <section style="padding-left: 15%;">
+
+    <!-- Include Required Prerequisites -->
+    <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+    <span></span> <b class="caret"></b>
+    </div>
+
+<script type="text/javascript">
+$(function() {
+
+    $('#reportrange span').html(moment("{{ date_from }}").format('MMMM D, YYYY') + ' - ' + moment("{{ date_to }}").format('MMMM D, YYYY'));
+
+    $('#reportrange').daterangepicker({
+        format: 'MM/DD/YYYY',
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment(),
+        minDate: '01/01/2012',
+        maxDate: '12/31/2015',
+        showDropdowns: true,
+        showWeekNumbers: true,
+        timePicker: false,
+        timePickerIncrement: 1,
+        timePicker12Hour: true,
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        opens: 'left',
+        drops: 'down',
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-primary',
+        cancelClass: 'btn-default',
+        separator: ' to ',
+        locale: {
+            applyLabel: 'Submit',
+            cancelLabel: 'Cancel',
+            fromLabel: 'From',
+            toLabel: 'To',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr','Sa'],
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            firstDay: 1
+        }
+    }, function(start, end, label) {
+        window.location.replace('?start='+start.format('YYYY-MM-DD')+'&end='+end.format('YYYY-MM-DD'));
+        console.log(start.toISOString(), end.toISOString(), label);
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    });
+
+});
+</script>
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active">
+            <a href="#sites" aria-controls="home" role="tab" data-toggle="tab">Сайты</a>
+        </li>
+        <li role="presentation">
+            <a href="#campaigns" aria-controls="profile" role="tab" data-toggle="tab">Рекламные кампании</a>
+        </li>
+        <li role="presentation">
+            <a href="#finances" aria-controls="profile" role="tab" data-toggle="tab">Финансы</a>
+        </li>
+    </ul>
+        <div class="tab-content">
+
+      <div role="tabpanel" class="tab-pane active" id="sites">
+      {% for site in  banner_list_array%}
+        <h1>{{ site.name }}</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название</th>
+                    <th>Кликов</th>
+                    <th>Просмотров</th>
+                    <th>CTR</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for banner in site.site_set %}
+                    <tr>
+                        <td>{{ banner.id }}</td>
+                        <td>{{ banner.name }}</td>
+                        <td>{{ banner.clicks }}</td>
+                        <td>{{ banner.views }}</td>
+                        <td>{{ banner.ctr|floatformat:3|intcomma }}</td>
+                    </tr>
+                {% endfor %}
+                <tr class="active">
+                    <td colspan="2">Итого</td>
+                    <td>{{site.sum_of_banner.clicks}}</td>
+                    <td>{{site.sum_of_banner.views}}</td>
+                    <td>{{site.sum_of_banner.ctr|floatformat:3|intcomma}}</td>
+                </tr>
+            </tbody>
+        </table>
+      {% endfor %}
+    </div>
+
+    <div role="tabpanel" class="tab-pane" id="campaigns">
+        <h1>Рекламные кампании</h1>
+    </div>
+    <div role="tabpanel" class="tab-pane" id="finances">
+        <h1>Финансы</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Название сайта</th>
+                    <th>Заработанные деньги</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for site in  banner_list_array%}
+                 <tr>
+                    <td>{{site.id}}</td>
+                    <td>{{site.name}}</td>
+                    <td>{{site.sum_of_banner.clicks}} $</td>
+                 </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+  </div>
+    <br>
+    <button class="btn btn-primary" onclick="location.href='/banner/new'">Создать новое место под баннер</button>
+    </section>
+{% endblock %}

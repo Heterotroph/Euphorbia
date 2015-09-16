@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Welcome to Django{% endblock %}
+{% block head %}Welcome to Django{% endblock %}
+{% block css %}
+{% load humanize %}
+
+
+{% endblock %}
+{% block content %}
+    <section style="padding-left: 15%;">
+
+    <!-- Include Required Prerequisites -->
+    <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+    <span></span> <b class="caret"></b>
+    </div>
+
+<script type="text/javascript">
+$(function() {
+
+    $('#reportrange span').html(moment("{{ date_from }}").format('MMMM D, YYYY') + ' - ' + moment("{{ date_to }}").format('MMMM D, YYYY'));
+
+    $('#reportrange').daterangepicker({
+        format: 'MM/DD/YYYY',
+        startDate: moment().subtract(29, 'days'),
+        endDate: moment(),
+        minDate: '01/01/2012',
+        maxDate: '12/31/2015',
+        showDropdowns: true,
+        showWeekNumbers: true,
+        timePicker: false,
+        timePickerIncrement: 1,
+        timePicker12Hour: true,
+        ranges: {
+           'Today': [moment(), moment()],
+           'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+           'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+           'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+           'This Month': [moment().startOf('month'), moment().endOf('month')],
+           'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        opens: 'left',
+        drops: 'down',
+        buttonClasses: ['btn', 'btn-sm'],
+        applyClass: 'btn-primary',
+        cancelClass: 'btn-default',
+        separator: ' to ',
+        locale: {
+            applyLabel: 'Submit',
+            cancelLabel: 'Cancel',
+            fromLabel: 'From',
+            toLabel: 'To',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr','Sa'],
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            firstDay: 1
+        }
+    }, function(start, end, label) {
+        window.location.replace('?start='+start.format('YYYY-MM-DD')+'&end='+end.format('YYYY-MM-DD'));
+        console.log(start.toISOString(), end.toISOString(), label);
+        $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+    });
+
+});
+</script>
+    <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#finances" aria-controls="home" role="tab" data-toggle="tab">Финансы</a></li>
+        <li role="presentation"><a href="#sites" aria-controls="profile" role="tab" data-toggle="tab">Сайты</a></li>
+    </ul>
+  <div class="tab-content">
+  {% for campaign_list in  campaign_list_array%}
+      <div role="tabpanel" class="tab-pane active" id="finances">
+        <h1>{{ campaign_list.name }}</h1>
+      <table style="margin: auto auto;"
+        <table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Кликов</th>
+            <th>Просмотров</th>
+            <th>CTR</th>
+            <th>Охват за последний месяц</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for campaign in campaign_list.campaign_set %}
+        <tr>
+            <td>{{ campaign.id }}</td>
+            <td>{{ campaign.name }}</td>
+            <td>{{ campaign.clicks }}</td>
+            <td>{{ campaign.views }}</td>
+            <td>{{ campaign.ctr|floatformat:3|intcomma }}</td>
+            <td>{{ campaign.reach }}</td>
+        </tr>
+        {% endfor %}
+        <tr class="active">
+            <td colspan="2">Итого</td>
+            <td>{{campaign_list.sum_of_campains.clicks}}</td>
+            <td>{{campaign_list.sum_of_campains.views}}</td>
+            <td>{{campaign_list.sum_of_campains.ctr|floatformat:3|intcomma}}</td>
+            <td>{{campaign_list.sum_of_campains.reach}}</td>
+        </tr>
+    </tbody>
+</table>
+    </div>
+  {% endfor %}
+  </div>
+    <br>
+    <button class="btn btn-primary" onclick="location.href='/campaign/new'">Создать рекламную кампанию</button>
+    </section>
+{% endblock %}

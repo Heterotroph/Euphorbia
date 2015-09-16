@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Welcome to Django{% endblock %}
+{% block head %}Welcome to Django{% endblock %}
+{% block content %}
+ <section ng-app="siteApp">
+        <link href="http://fontawesome.io/assets/font-awesome/css/font-awesome.css" rel="stylesheet" media="screen">
+     <link href="/static/css/profile.css" rel="stylesheet" type="text/css">
+<div class="container">
+    <div class="row user-menu-container square">
+        <div class="col-md-7 user-details">
+            <div class="row white">
+                <div class="col-md-6 no-pad">
+                    <div class="user-pad">
+                        <h3>{{ user.username }}</h3>
+                        <h4 class=><i class="fa fa-check-circle-o"></i>{% ifequal user.groups.all.0.name 'publisher' %} Вебмастер {% endifequal %}
+                        {% ifequal user.groups.all.0.name 'advertiser' %} Рекламодатель {% endifequal %}</h4>
+                        <button type="button" class="btn btn-labeled btn-info" href="#">
+                            <span class="btn-label"><i class="fa fa-pencil"></i></span>Update</button>
+                    </div>
+                </div>
+                <div class="col-md-6 no-pad">
+                    <div class="user-image">
+                        <img src="https://farm7.staticflickr.com/6163/6195546981_200e87ddaf_b.jpg" class="img-responsive thumbnail">
+                    </div>
+                </div>
+            </div>
+            <div class="row overview">
+                <div class="col-md-4 user-pad text-center">
+                    <h3>ПРОСМОТРОВ</h3>
+                    <h4>2,784</h4>
+                </div>
+                <div class="col-md-4 user-pad text-center">
+                    <h3>КЛИКОВ</h3>
+                    <h4>456</h4>
+                </div>
+                <div class="col-md-4 user-pad text-center">
+                    <h3>ДЕНЕГ {% ifequal user.groups.all.0.name 'advertiser' %}ПОТРАЧЕНО{% endifequal %}</h3>
+                    <h4>901 $</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ </section>
+
+{% endblock %}
