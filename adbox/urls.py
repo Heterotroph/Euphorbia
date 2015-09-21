@@ -22,4 +22,5 @@ urlpatterns = patterns('',
     url(r'^conditions/', conditions),
     url(r'^formats/', formats),
     url(r'^thanks/', thanks),
+    url(r'^rotator/', include('rotator.urls', namespace="user")),
 )
