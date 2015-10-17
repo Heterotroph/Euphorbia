@@ -11,5 +11,20 @@
         URL:<br>
         <p>{{ instance.name }}</p>
 <a href="/rotator/sites/edit/{{ instance.id }}/">Изменить</a>
+<br>
+{% if instance.userpixel_set.all|length == 0 %}
+    ДЛЯ ЭТОГО САЙТА НЕТ ЕЩЕ НИ ОДНОГО ПИКСЕЛЯ <a href="create_pixel/"><b>СОЗДАТЬ</b></a>
+{% else %}
+    <h3>СПИСОК ПИКСЕЛЕЙ ЭТОГО САЙТА</h3>
+    <table cellspacing="2" border="1" cellpadding="5" width="600">
+    {% for pixel in instance.userpixel_set.all %}
+        <tr>
+            <td>{{pixel.name}}</td>
+            <td><a href="/rotator/pixel/{{ pixel.id }}/">ПОДРОБНЕЕ</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    <a href="create_pixel/"><b>СОЗДАТЬ ЕЩЕ</b></a>
+{% endif %}
 </section>
 {% endblock %}

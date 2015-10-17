@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Список сайтов{% endblock %}
+{% block head %}Adbox{% endblock %}
+{% block css %}
+{% load humanize %}
+{% endblock %}
+{% block content %}
+<section>
+        NAME:<br>
+        <p>{{ instance.name }}</p>
+        SITE CODE:<br>
+        <p>&lt;img src=&quot;http://px.adbox.kz/p/{{ instance.unique_code }}.gif&quot; height=&quot;1&quot; width=&quot;1&quot;&gt;</p>
+<a href="/rotator/pixel/{{ instance.id }}/edit/">Изменить</a>
+</section>
+{% endblock %}
