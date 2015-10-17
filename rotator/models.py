@@ -21,5 +21,9 @@ class ImageBanner(Banner):
     image = models.ImageField(blank=False)
 
 
-
+class UserSite(models.Model):
+    user = models.ForeignKey(User, unique=False)
+    name = models.CharField(max_length=100)
+    url = models.CharField(max_length=200)
+    created = models.DateTimeField(default=datetime.now())
 

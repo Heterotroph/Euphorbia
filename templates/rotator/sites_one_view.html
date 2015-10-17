@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Список сайтов{% endblock %}
+{% block head %}Adbox{% endblock %}
+{% block css %}
+{% load humanize %}
+{% endblock %}
+{% block content %}
+<section>
+        NAME:<br>
+        <p>{{ instance.name }}</p>
+        URL:<br>
+        <p>{{ instance.name }}</p>
+<a href="/rotator/sites/edit/{{ instance.id }}/">Изменить</a>
+</section>
+{% endblock %}
