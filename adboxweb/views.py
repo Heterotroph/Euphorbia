@@ -1,3 +1,5 @@
+import json
+from django.db import connection
 from django.shortcuts import render
 
 # Create your views here.
@@ -7,13 +9,15 @@ from django.contrib.auth import logout
 from django.contrib.auth.models import Group
 from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from django.core.context_processors import csrf
+from django.http import JsonResponse
 
 
 from adboxweb.models import Banner, Site, BannerRequest, CampaignRequest
 from django.views.generic.base import TemplateResponse, RedirectView
+from rotator.models import UserSite, UserPixel
 
 
 @csrf_protect
@@ -112,7 +116,7 @@ def new_banner(request):
     mdict.update(csrf(request))
     return render_to_response('banner_form.html', mdict)
 
-@login_required
+"""@login_required
 def banner_list(request):
     import datetime
     from datetime import date
@@ -147,10 +151,106 @@ def banner_list(request):
     return render_to_response(
     'banners.html',
     {'user': request.user, 'banner_list_array': rendered_banner_data, 'date_from': date_from, 'date_to': date_to}
-    )
+    )"""
 
 
 
+
+
+
+
+
+@login_required
+def publisher(request):
+    left_menu_data = get_menu(request.user)
+    left_menu_links = get_menu_links(request.user)
+    toolbar_dates = get_toolbar_dates(request.user)
+    treetable_data = get_sites(request.user)
+    views_chart_data = get_views_data(request.user, """ первый айди в treetable_data """)
+    views_chart_axis_steps = get_views_steps(request.user)
+    time_chart_data = get_time_data(request.user, """ первый айди в treetable_data """)
+    time_chart_axis_steps = get_time_steps(request.user)
+    context= {'left_menu_data':left_menu_data, 'left_menu_links':left_menu_links, 'toolbar_dates':toolbar_dates, 'treetable_data':treetable_data, 'views_chart_data':views_chart_data, 'views_chart_axis_steps':views_chart_axis_steps, 'time_chart_data':time_chart_data, 'time_chart_axis_steps':time_chart_axis_steps}
+    return render_to_response("publisher.html", context, context_instance=RequestContext(request))
+
+def publisher_ajax(request):
+    command = request.GET.get("command")
+    return HttpResponse(get_command(command)(request))
+
+def get_command(com):
+    return {
+        'set_date': refresh_data,
+        'refresh': refresh_data,
+        'create_site': create_site,
+        'create_tracking': create_tracking,
+        'edit_site': edit_site,
+        'select_site': select_site,
+        }.get(com)
+
+def refresh_data(request):
+    toolbar_dates = get_toolbar_dates(request.user)
+    treetable_data = get_sites(request.user)
+    views_chart_data = get_views_data(request.user, """ первый айди в treetable_data """)
+    views_chart_axis_steps = get_views_steps(request.user)
+    time_chart_data = get_time_data(request.user, """ первый айди в treetable_data """)
+    time_chart_axis_steps = get_time_steps(request.user)
+    #из этого собрать любой большой JSON. Я разберусь
+    return HttpResponse("Данные таблиц и графиков");
+
+
+
+
+
+
+
+
+
+
+
+def example(pixel_id):
+    cursor = connection.cursor()
+    pixel = UserPixel.objects.get(pk=1)
+    cursor.execute("SELECT pixel_id, count(*) FROM pixel_loads WHERE pixel_id = %s GROUP BY pixel_id", pixel.unique_code)
+    pixel_stats = dictfetchall(cursor)
+    return HttpResponse("return this string")
+
+def example2(arg):
+    cursor = connection.cursor()
+    cursor.execute("SELECT median(active_time) as active, date(created), median(EXTRACT(EPOCH FROM (session_updated-created))) as total from page_sessions_link where active_time is not null and page_unique_code='F27A96423901455' group by date(created)")
+    test_data = dictfetchall(cursor)
+    for data1 in test_data:
+        data1['date']=data1['date'].strftime('%d.%m.%Y')
+    return HttpResponse(test_data)
+
+def example3(request):
+    sites_list = list(UserSite.objects.filter(user=request.user))
+    pixel_list = list(UserPixel.objects.filter(site__in=sites_list))
+    pixel_code_list = [pixel.unique_code for pixel in pixel_list]
+    pixel_map = {pixel.unique_code: pixel for pixel in pixel_list}
+
+    pixel_code_list_string = "'"+"','".join(pixel_code_list)+"'"
+
+    query = "select date(created) as date, count(session_id), count(local_user_id), page_unique_code from \
+    page_sessions_link where page_unique_code in (%s) group by date(created), page_unique_code;" % pixel_code_list_string
+    cursor = connection.cursor()
+    cursor.execute(query)
+    data = dictfetchall(cursor)
+    for entry in data:
+        page_unique_code = entry.pop('page_unique_code')
+        page = pixel_map[page_unique_code]
+        site = page.site
+        entry['site']={"id":site.id,"site_name":site.name}
+        entry['page']={"id":page.id,"page_name":page.name}
+        entry['date']=entry['date'].strftime('%d.%m.%Y')
+    return HttpResponse(json.dumps(data))
+
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+        ]
 
 @login_required
 def campaign_list(request):
