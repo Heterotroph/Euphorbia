@@ -223,10 +223,10 @@ def get_sites(request):
             pixel = pixel_map[data['page_unique_code']]
             pixel_entry = {"id":pixel.id, "value":pixel.name, "time":entry['total'], "active":entry['active'], "visits":entry['visits'], "uniq":entry['unique_visits']}
             pixels_data.append(pixel_entry)
-        site_active = sum([entry['active'] for entry in data])/len(data)
-        site_time = sum([entry['total'] for entry in data])/len(data)
-        site_visits = sum([entry['visits'] for entry in data])/len(data)
-        site_unique_visits = sum([entry['unique_visits'] for entry in data])/len(data)
+        site_active = sum([entry['active'] for entry in data])/len(data) if len(data)>0 else 0
+        site_time = sum([entry['total'] for entry in data])/len(data)  if len(data)>0 else 0
+        site_visits = sum([entry['visits'] for entry in data])/len(data) if len(data)>0 else 0
+        site_unique_visits = sum([entry['unique_visits'] for entry in data])/len(data) if len(data)>0 else 0
         site_data = {"id":site.id, "value":site.name, "time":site_time, "active":site_active,
                      "visits":site_visits, "uniq":site_unique_visits, "open":True, "data":pixels_data}
         data.append(site_data)
