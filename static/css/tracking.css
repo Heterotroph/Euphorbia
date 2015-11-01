@@ -1,0 +1,39 @@
+.data-visualization_container {
+	margin: 0 62px 0;
+	min-height: 300px;
+	height: auto;
+}
+
+.datatable_left_alignment {
+	text-align: left;
+}
+
+.datatable_right_alignment {
+	text-align: right;
+}
+
+.datatable_center_alignment {
+	text-align: center;
+}
+
+.datatable_rowspan_header {
+	text-align: center;
+	font-size: 12px;
+}
+
+.datatable_hover {
+	background: #F0DCB6;
+}
+
+div.ui-base-content-inner-div {
+	margin-top: 30px;
+    margin-left: 20px;
+}
+
+.webix_layout_toolbar.webix_toolbar {
+	background: #666666;
+}
+
+.webix_ui_label_toolbar {
+	font-size: 5px;
+}

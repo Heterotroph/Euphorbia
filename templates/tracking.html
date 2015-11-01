@@ -1,0 +1,261 @@
+{% extends "ui-base.html" %}
+{% block title %}Сайт трекинг{% endblock %}
+
+
+{% block css %}
+
+    <!-- webix.css -->
+    <link href="/static/libs/webix/codebase/webix.css" rel="stylesheet" type="text/css" >
+
+	<!-- tracking.css -->
+    <link href="/static/css/tracking.css" rel="stylesheet" type="text/css" >
+
+	<!--left-menu.css-->
+	<link href="/static/css/left-menu.css" rel="stylesheet" type="text/css" >
+
+{% endblock %}
+
+{% block js %}
+
+	<!-- jQuery -->
+	<script src="/static/libs/jquery-2.1.4.min.js"></script>
+
+	<!-- tracking.js -->
+    <script src="/static/js/tracking.js"></script>
+
+    <!-- left_menu.js -->
+    <script src="/static/js/left_menu.js"></script>
+
+    <!-- Webix JS Core -->
+    <script src="/static/libs/webix/codebase/webix.js"></script>
+
+{% endblock %}
+
+
+{% block webix_data %}
+
+var menuData = {
+
+	"leftMenuData": {{ left_menu_data|safe }},
+	"leftMenuLinks": {{ left_menu_links|safe }}
+
+};
+
+var spIDData = {{ sp_id_data|safe }}
+
+var contentData = {
+
+	"toolbarDates": {{ toolbar_dates|safe }},
+
+	"trackTreetableData": {{ treetable_data|safe }},
+
+	"visitChartData": {{ views_chart_data|safe }},
+	"visitChartLegendData": [{text:"Общее число посещений",color:"#a7ee70"},{text:"Уникальные поситители",color:"#36abee"}],
+	"visitChartYAxis":{{ views_chart_axis_steps|safe }},
+
+	"timeChartData": {{ time_chart_data|safe }},
+	"timeChartLegendData": [{text:"Среднее время на сайте",color:"#a7ee70"},{text:"Среднее время активности",color:"#36abee"}],
+	"timeChartYAxis": {{ time_chart_axis_steps|safe }},
+
+};
+
+{% endblock %}
+
+{% block menu %}<div class="ui-base-menu-inner-div" id="leftMenuContainerInner"></div>{% endblock %}
+{% block content %}<div class="ui-base-content-inner-div" id="contentContainerInner"></div>{% endblock %}
+
+{% block webix_code %}
+
+		var preloaderDelay = 20000;
+
+		var currentSPID = contentData.trackTreetableData[0]["spID"];
+		var currentSPKey = getSPQueryKey(contentData.trackTreetableData[0]["id"]);
+		var currentName = contentData.trackTreetableData[0]["value"];
+
+		//Старт вебикса
+		webix.ready(function () {
+			buildLeftMenu(menuData, "leftMenuContainerInner", leftMenuClick);
+			$$("leftMenuID").select(1);
+
+			contentData["viewLabelText"] = "Количество посещений " + "«" + currentName + "»";
+			contentData["timeLabelText"] = "Средняя длительность посещений " + "«" + currentName + "»" + " (сек.)";
+			buildContent(contentData, "contentContainerInner", dateClick, refreshClick, treetableClick);
+			$$("trackTreetableID").select(1);
+		});
+
+		//Обработка нажатия на меню слева
+		function leftMenuClick(itemID) {
+			document.location.href = menuData.leftMenuLinks[itemID - 1]
+		}
+
+		//Обработка нажатия на выбор даты
+		function dateClick(selectedDate) {
+
+		}
+
+		//Обработка кнопки "обновить"
+		function refreshClick() {
+			loadRefresh(5);
+			$$("trackTreetableID").showProgress({
+				type:"bottom",
+				delay:preloaderDelay,
+				hide:false
+			});
+
+			$$("visitChartID").showProgress({
+			   type:"icon",
+			   delay:preloaderDelay
+			});
+
+			$$("timeChartID").showProgress({
+			   type:"icon",
+			   delay:preloaderDelay
+			});
+		}
+
+		//Обработка выбора сайта из списка
+		function treetableClick(itemID) {
+			var spID = getSPIDByRow(itemID);
+			if (spID) {
+				if (spID != currentSPID) {
+					loadSPData(getSPQueryKey(itemID), spID, 5)
+					$$("trackTreetableID").showProgress({
+						type:"bottom",
+						delay:preloaderDelay,
+						hide:false
+					});
+
+					$$("visitChartID").showProgress({
+					   type:"icon",
+					   delay:preloaderDelay
+					});
+
+					$$("timeChartID").showProgress({
+					   type:"icon",
+					   delay:preloaderDelay
+					});
+				}
+			}
+		}
+
+		//Получение ID сайта или страницы (пикселя) на основе ID в списке treetable
+		function getSPIDByRow(value) {
+			return spIDData[value];
+		}
+
+		//Получение site_id или page_id для query string
+		function getSPQueryKey(value) {
+			return ["site_id", "page_id"][Number(value.indexOf(".") != -1)];
+		}
+
+		//Загрузка данных для графиков-хуяфиков и тритейбла, по нажатию "обновить"
+		function loadRefresh(attempts) {
+			if (attempts <= 0) {
+				webix.alert("Упс.<br>Проверьте интернет соединение и нажмите «OK»", function(result){location.reload();});
+				return;
+			}
+			var reqData = {};
+				reqData["command"] = "get_refresh_data";
+				reqData[currentSPKey] = currentSPID;
+			$.ajax({
+				url: "../tracking_ajax/",
+				type: "get",
+				data: reqData,
+				success: function(response) {
+					spUpdate(response);
+					ttUpdate(response);
+					spIDData = response.spIDData
+					$$("trackTreetableID").hideProgress();
+					$$("visitChartID").hideProgress();
+					$$("timeChartID").hideProgress();
+				},
+				error: function(xhr) {
+					loadRefresh(attempts - 1)
+					$$("trackTreetableID").hideProgress();
+					$$("visitChartID").hideProgress();
+					$$("timeChartID").hideProgress();
+				}
+			});
+		}
+
+		//Загрузка данных для графиков-хуяфиков (Рекурсия)
+		function loadSPData(spKey, spID, attempts) {
+			if (attempts <= 0) {
+				webix.alert("Упс.<br>Проверьте интернет соединение и нажмите «OK»", function(result){location.reload();});
+
+				setVisibleWebixComponent("visitChartID", false);
+				setVisibleWebixComponent("viewToolbarID", false);
+				setVisibleWebixComponent("timeChartID", false);
+				setVisibleWebixComponent("timeToolbarID", false);
+
+				return;
+			}
+			var reqData = {};
+				reqData["command"] = "get_data_by_sp_id";
+				reqData[spKey] = spID;
+
+			$.ajax({
+				url: "../tracking_ajax/",
+				type: "get",
+				data: reqData,
+				success: function(response) {
+					spUpdate(response);
+					currentSPID = spID;
+					currentSPKey = spKey
+					$$("trackTreetableID").hideProgress();
+					$$("visitChartID").hideProgress();
+					$$("timeChartID").hideProgress();;
+				},
+				error: function(xhr) {
+					loadSPData(spKey, spID, attempts - 1);
+					$$("trackTreetableID").hideProgress();
+					$$("visitChartID").hideProgress();
+					$$("timeChartID").hideProgress();
+				}
+			});
+		}
+
+		//Вывод полученной инфы в гуй (графики-хуяфики)
+		function spUpdate(dataJSON) {
+			currentName = dataJSON.spName;
+
+			var isVisible = dataJSON.visitChartData.length > 1;
+			setVisibleWebixComponent("visitChartID", isVisible);
+			setVisibleWebixComponent("viewToolbarID", isVisible);
+
+			if (!isVisible) {
+				webix.alert("Пока мы собрали<br>маловато данных.<br>Завтра будет больше!");
+			}
+
+			$$("visitChartID").clearAll();
+			$$("visitChartID").parse(dataJSON.visitChartData)
+			$$("visitChartID").yAxis = dataJSON.visitChartYAxis;
+			$$("viewToolbarLabelID").define("label", "Количество посещений " + "«" + currentName + "»");
+			$$("viewToolbarLabelID").refresh();
+
+			isVisible = dataJSON.timeChartData.length > 1;
+			setVisibleWebixComponent("timeChartID", isVisible);
+			setVisibleWebixComponent("timeToolbarID", isVisible);
+
+			$$("timeChartID").clearAll();
+			$$("timeChartID").parse(dataJSON.timeChartData);
+			$$("timeChartID").yAxis = dataJSON.timeChartYAxis;
+			$$("timeToolbarLabelID").define("label", "Средняя длительность посещений " + "«" + currentName + "»" + " (сек.)");
+			$$("timeToolbarLabelID").refresh();
+		}
+
+		//Вывод полученной инфы в гуй (тритейбл)
+		function ttUpdate(dataJSON) {
+			$$("trackTreetableID").parse(dataJSON.trackTreetableData);
+		}
+
+		//На кой хер эти господа из вебикс сделали методы show и hide? Лучше б что-нить типа visible...
+		function setVisibleWebixComponent(compID, isVisible) {
+			if (isVisible) {
+				$$(compID).show();
+			} else {
+				$$(compID).hide();
+			}
+		}
+
+{% endblock %}

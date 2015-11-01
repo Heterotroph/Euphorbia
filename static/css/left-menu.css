@@ -1,0 +1,8 @@
+.webix_ui_leftmenu {
+    border-radius: 0px;
+}
+
+div.ui-base-menu-inner-div {
+	margin-top: 20px;
+	vertical-align: top;
+}
