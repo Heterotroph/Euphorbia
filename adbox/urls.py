@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^platform/login/', tracking),
     url(r'^platform/', tracking),
     #
+    url(r'^admin/', include(admin.site.urls)),
     # url(r'^campaigns/', campaign_list),
     # url(r'^campaign/new/', new_campaign),
     # url(r'^publisher/register', register_publisher, name='register_publisher'),
