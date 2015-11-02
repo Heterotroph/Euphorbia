@@ -165,14 +165,14 @@ def tracking(request):
     time_chart_axis_steps = get_views_steps(time_chart_data, ["active", "total"])
 
     # Ликвидация экранирования
-    left_menu_data = json.dumps(left_menu_data).decode("unicode_escape")
-    left_menu_links = json.dumps(left_menu_links).decode("unicode_escape")
-    toolbar_dates = json.dumps(toolbar_dates).decode("unicode_escape")
-    treetable_data = json.dumps(treetable_data).decode("unicode_escape")
-    views_chart_data = json.dumps(views_chart_data).decode("unicode_escape")
-    views_chart_axis_steps = json.dumps(views_chart_axis_steps).decode("unicode_escape")
-    time_chart_data = json.dumps(time_chart_data).decode("unicode_escape")
-    time_chart_axis_steps = json.dumps(time_chart_axis_steps).decode("unicode_escape")
+    left_menu_data = json.dumps(left_menu_data)
+    left_menu_links = json.dumps(left_menu_links)
+    toolbar_dates = json.dumps(toolbar_dates)
+    treetable_data = json.dumps(treetable_data)
+    views_chart_data = json.dumps(views_chart_data)
+    views_chart_axis_steps = json.dumps(views_chart_axis_steps)
+    time_chart_data = json.dumps(time_chart_data)
+    time_chart_axis_steps = json.dumps(time_chart_axis_steps)
 
     context = {"left_menu_data": left_menu_data, "left_menu_links": left_menu_links, "toolbar_dates": toolbar_dates,
                "treetable_data": treetable_data, "sp_id_data": sp_id_data,"views_chart_data": views_chart_data,
@@ -262,7 +262,7 @@ def get_sites(request):
 
             query = "SELECT page_unique_code, median(coalesce(active_time, 0)) as active, median(EXTRACT(EPOCH from (coalesce(session_updated, created) - created))) AS total, count(session_id) as visits, count(DISTINCT local_user_id) as unique_visits \
                         FROM page_sessions_link \
-                        WHERE page_unique_code in (%s) \
+                        WHERE os != 'NULL' AND browser  != 'NULL' AND page_unique_code in (%s) \
                         GROUP BY page_unique_code \
                         ORDER BY page_unique_code" % pixel_code_list_str
 
@@ -345,7 +345,7 @@ def get_views_data(site_id, page_id):
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
     query = "SELECT date(created) as date, count(session_id) as visits, count(DISTINCT local_user_id) as unique_visits \
                     FROM page_sessions_link \
-                    WHERE page_unique_code in (%s) \
+                    WHERE os != 'NULL' AND browser  != 'NULL' AND page_unique_code in (%s) \
                     GROUP BY date(created) \
                     ORDER BY date(created)" % pixel_code_list_str
     data = get_data_from_sql(query)
@@ -382,7 +382,7 @@ def get_time_data(site_id, page_id):
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
     query = "SELECT date(created) as date, median(coalesce(active_time, 0)) as active, median(EXTRACT(EPOCH from (coalesce(session_updated, created) - created))) as total \
                     FROM page_sessions_link \
-                    WHERE page_unique_code in (%s) \
+                    WHERE os != 'NULL' AND browser  != 'NULL' AND page_unique_code in (%s) \
                     GROUP BY date(created) \
                     ORDER BY date(created)" % pixel_code_list_str
     data = get_data_from_sql(query)
@@ -390,7 +390,7 @@ def get_time_data(site_id, page_id):
     counter = 0
     for entry in data:
         # result_data.append({"active": entry["active"], "total": entry["total"], "xAxis": str(entry["date"])})
-        result_data.append({"id": counter, "active": int(entry["active"]), "total": int(entry["total"]), "xAxis": str(entry["date"])})
+        result_data.append({"id": counter, "active": int(entry["active"]) + 1, "total": int(entry["total"]) + 1, "xAxis": str(entry["date"])})
         counter += 1
     # return [{"active": entry["active"], "total": entry["total"], "xAxis": idx} for idx, entry in data]
     return result_data
@@ -400,7 +400,8 @@ def get_time_data(site_id, page_id):
 #   Формирование настроек для графика относительно данных
 #
 def get_views_steps(data, key_list):
-    max_value = max([max([entry[key] for entry in data]) for key in key_list]) if len(data) > 0 else 1
+    max_value = max([max([entry[key] for entry in data]) for key in key_list]) if len(data) > 0 else 10
+    max_value = 10 if max_value < 10 else max_value
     max_value = max_value * 1.2
     step = max_value / 10
     return {"start": 0,

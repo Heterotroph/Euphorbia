@@ -85,8 +85,7 @@ function buildContent(data, containerID, dateCallback, refreshCallback, treetabl
 			tooltip:"Длительность активных действий посетителей более #active#"
 		}, {
 			id: "visits",
-			header:[{text: "Посещения", colspan:2, css:"datatable_rowspan_header"},{text:"Всего", css:"datatable_center_alignment" }],
-			adjust: "header",
+			header:[{text: "Количество посещений", colspan:2, css:"datatable_rowspan_header"},{text:"Всего", css:"datatable_center_alignment" }],
 			css: "datatable_right_alignment"
 		}, {
 			id: "uniq",
@@ -110,10 +109,17 @@ function buildContent(data, containerID, dateCallback, refreshCallback, treetabl
 		width: 880,
 		height: 300,
 		alpha: 0.7,
+		scale: "linear",
+		offset: false,
+		//preset: "simple",
 		xAxis: {
 			template: "#xAxis#"
 		},
-		yAxis: data.visitChartYAxis,
+		yAxis: {
+			template:function(obj){return (obj)},
+			origin: 0
+		},
+		//yAxis: data.visitChartYAxis,
 		legend: {
 			values: data.visitChartLegendData,
 			valign: "top",
@@ -161,10 +167,15 @@ function buildContent(data, containerID, dateCallback, refreshCallback, treetabl
 		width: 880,
 		height: 300,
 		alpha: 0.7,
+		scale: "linear",
 		xAxis: {
 			template: "#xAxis#"
 		},
-		yAxis: data.timeChartYAxis,
+		yAxis: {
+			template:function(obj){return (obj)},
+			origin: 0
+		},
+		//yAxis: data.timeChartYAxis,
 		legend: {
 			values: data.timeChartLegendData,
 			valign: "top",

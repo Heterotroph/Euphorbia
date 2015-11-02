@@ -228,8 +228,10 @@ var contentData = {
 			}
 
 			$$("visitChartID").clearAll();
+			//$$("visitChartID").yAxis = dataJSON.visitChartYAxis;
 			$$("visitChartID").parse(dataJSON.visitChartData)
-			$$("visitChartID").yAxis = dataJSON.visitChartYAxis;
+			$$("visitChartID").refresh();
+			$$("visitChartID").render();
 			$$("viewToolbarLabelID").define("label", "Количество посещений " + "«" + currentName + "»");
 			$$("viewToolbarLabelID").refresh();
 
@@ -238,8 +240,10 @@ var contentData = {
 			setVisibleWebixComponent("timeToolbarID", isVisible);
 
 			$$("timeChartID").clearAll();
+			//$$("timeChartID").yAxis = dataJSON.timeChartYAxis;
 			$$("timeChartID").parse(dataJSON.timeChartData);
-			$$("timeChartID").yAxis = dataJSON.timeChartYAxis;
+			$$("timeChartID").refresh();
+			$$("timeChartID").render();
 			$$("timeToolbarLabelID").define("label", "Средняя длительность посещений " + "«" + currentName + "»" + " (сек.)");
 			$$("timeToolbarLabelID").refresh();
 		}
