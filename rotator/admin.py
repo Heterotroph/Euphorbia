@@ -2,8 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Banner
-from .models import Campaign
+from .models import UserPixel, UserSite
 
-admin.site.register(Banner)
-admin.site.register(Campaign)
+admin.site.register(UserPixel)
+admin.site.register(UserSite)

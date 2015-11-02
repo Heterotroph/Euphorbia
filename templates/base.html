@@ -103,19 +103,6 @@
                     <li class="hidden">
                         <a href="#page-top"></a>
                     </li>
-                    <li class="page-scroll">
-                        <a href="/accounts/profile/">Профиль</a>
-                    </li>
-                         {% ifequal user.groups.all.0.name 'publisher' %}
-                    <li class="page-scroll">
-                        <a href="/statistics/">Финансы</a>
-                    </li>
-                         {% endifequal %}
-                     {% ifequal user.groups.all.0.name 'advertizer' %}
-                    <li class="page-scroll">
-                        <a href="/campaigns/">Кампании</a>
-                    </li>
-                         {% endifequal %}
                     <li>
                         <a href="/logout">Выйти</a>
                     </li>
@@ -125,14 +112,6 @@
                     <li class="hidden">
                         <a href="#page-top"></a>
                     </li>
-                    <li class="page-scroll">
-                        <a href="/#portfolio">Предложение</a>
-                    </li>
-                    <li class="page-scroll">
-                        <a href="/#about">О нас</a>
-                    </li>
-                    <li>
-                        <a href="/login">Личный кабинет</a>
                     </li>
                 </ul>
                 {%endif%}
