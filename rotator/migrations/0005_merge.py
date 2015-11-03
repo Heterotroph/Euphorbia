@@ -7,12 +7,9 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('adboxweb', '0003_auto_20150518_1442'),
+        ('rotator', '0004_auto_20151017_1030'),
+        ('rotator', '0002_auto_20151014_0958'),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='banner',
-            name='user',
-        ),
     ]

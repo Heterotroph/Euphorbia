@@ -1,136 +1,29 @@
 # -*- coding: utf-8 -*-
 import json
+from django.contrib.auth import logout
 
 from django.db import connection
 from django.shortcuts import render
 
 
 # Create your views here.
-from adboxweb.forms import *
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
-from django.views.decorators.csrf import csrf_protect
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template import RequestContext
-from django.core.context_processors import csrf
-from adboxweb.models import Banner, BannerRequest, CampaignRequest
-from django.views.generic.base import TemplateResponse, RedirectView
 from rotator.models import UserSite, UserPixel
 
-
-@csrf_protect
-def register(request):
-    if request.method == "POST":
-        form = RegistrationForm(request.POST)
-        if form.is_valid():
-            user = User.objects.create_user(
-                username=form.cleaned_data["username"],
-                password=form.cleaned_data["password1"],
-                email=form.cleaned_data["email"]
-            )
-            from django.contrib.auth.models import Group
-            g = Group.objects.get(name="publisher")
-            g.user_set.add(user)
-            return HttpResponseRedirect("/register/success/")
-    else:
-        form = RegistrationForm()
-    variables = RequestContext(request, {
-        "form": form
-    })
-
-    return render_to_response(
-        "registration/register.html",
-        variables,
-    )
-
-
-def register_success(request):
-    return render_to_response(
-        "registration/success.html",
-    )
-
-
-def logout_page(request):
-    logout(request)
-    return HttpResponseRedirect("/")
-
-
-def index(request):
-    return render_to_response(
-        "index.html",
-    )
 
 
 @login_required
 def home(request):
-    banner_list = Banner.objects.all()
-    is_publisher = True
-    is_advertiser = True
-    return render_to_response(
-        "tracking.html",
-        {"user": request.user, "banner_list": banner_list, "is_publisher": is_publisher, "is_advertiser": is_advertiser}
-    )
-
-
-def thanks(request):
-    return render_to_response(
-        "thanks.html",
-        {"user": request.user, }
-    )
-
-
-def faq(request):
-    return render_to_response(
-        "faq.html",
-        {"user": request.user, }
-    )
-
-
-def instructions(request):
-    return render_to_response(
-        "instructions.html",
-        {"user": request.user, }
-    )
-
-
-def conditions(request):
-    return render_to_response(
-        "conditions.html",
-        {"user": request.user, }
-    )
-
-
-def formats(request):
-    return render_to_response(
-        "formats.html",
-        {"user": request.user, }
-    )
-
-
-@login_required
-def new_banner(request):
-    if request.method == "POST":  # If the form has been submitted...
-        form = BannerForm(request.POST)  # A form bound to the POST data
-        if form.is_valid():  # All validation rules pass
-            adriver_id = form.cleaned_data["adriver_id"]
-            url_snippet = form.cleaned_data["url_snippet"]
-            banner = Banner.objects.create(adriver_id=adriver_id, url_snippet=url_snippet, user=User.objects.all()[0])
-            saved = banner.save()
-            if saved:
-                return HttpResponseRedirect("/home/")  # Redirect after POST
-            else:
-                return HttpResponseRedirect("/home/")  # Redirect after PO
-    else:
-        form = BannerForm()  # An unbound form
-    mdict = {"form": form, }
-    mdict.update(csrf(request))
-    return render_to_response("banner_form.html", mdict)
+    return HttpResponseRedirect("/platform/tracking/")
 
 
 
-
-
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect("/")
 
 #
 #   -||-||-||-||-||-
@@ -494,112 +387,3 @@ def time_presentation(seconds, prefix0="", prefix1=""):
 
 
 
-
-
-
-
-
-@login_required
-def campaign_list(request):
-    import datetime
-    from datetime import date
-
-    try:
-        date_from = request.GET.get("start", date(2002, 12, 4).isoformat())
-        date_to = request.GET.get("end", date.today().isoformat())
-        d = datetime.datetime.strptime(date_from, "%Y-%m-%d")
-        d = datetime.datetime.strptime(date_to, "%Y-%m-%d")
-    except ValueError:
-        date_from = date(2002, 12, 4).isoformat()
-        date_to = date.today().isoformat()
-    from adboxweb.models import CampaignList
-    campaign_list_array = CampaignList.objects.all()
-    rendered_campaign_data = []
-
-    for campaign_list in campaign_list_array:
-        sum_of_campains = {"clicks": 0, "views": 0, "ctr": 0}
-        one_campaign_list = {"id": campaign_list.id, "name": campaign_list.name, "sum_of_campains": sum_of_campains}
-        campaign_array = campaign_list.campaign_set.all()
-        one_campaign_list["campaign_set"] = []
-        for campaign in campaign_array:
-            import adriver
-            clicks, views, reach = adriver.get_advert_clicks_and_views(campaign.adriver_id, start=date_from,
-                                                                       stop=date_to)
-            ctr = -1 if views == 0 else float(clicks) / views
-            print(ctr)
-            print(clicks / views)
-            money_left = 100
-            one_campaign_list["campaign_set"].append(
-                {"id": campaign.id, "name": campaign.name, "clicks": clicks, "views": views, "ctr": ctr,
-                 "reach": reach})
-            sum_of_campains["clicks"] += clicks
-            sum_of_campains["views"] += views
-        sum_of_campains["ctr"] = -1 if sum_of_campains["views"] == 0 else float(sum_of_campains["clicks"]) / \
-                                                                          sum_of_campains["views"]
-        rendered_campaign_data.append(one_campaign_list)
-    print rendered_campaign_data
-    return render_to_response(
-        "campaigns.html",
-        {"user": request.user, "campaign_list_array": rendered_campaign_data, "date_from": date_from,
-         "date_to": date_to}
-    )
-
-
-@login_required
-def edit_banner(request):
-    instance = Banner.objects.get(id=id)
-    form = BannerForm(request.POST or None, instance=instance)
-    if form.is_valid():
-        form.save()
-        return RedirectView("next_view")
-    return TemplateResponse(request, "banner_form.html", {"form": form})
-
-
-def register_advertizer(request):
-    return render_to_response("registration/register_advertizer.html")
-
-
-def register_publisher(request):
-    if request.method == "GET":
-        return render_to_response("registration/register_publisher.html")
-    elif request.method == "POST":
-        return render_to_response("base.html")
-
-
-def new_banner(request):
-    # if this is a POST request we need to process the form data
-    if request.method == "POST":
-        # create a form instance and populate it with data from the request:
-        form = BannerForm(request.POST)
-        # check whether it's valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            banner_request = BannerRequest.objects.create(site_url=form.cleaned_data["site_url"],
-                                                          banner_format=form.cleaned_data["banner_format"])
-            banner_request.save()
-            # redirect to a new URL:
-            return HttpResponseRedirect("/thanks/")
-    # if a GET (or any other method) we"ll create a blank form
-    else:
-        form = BannerForm()
-    return render(request, "banner_form.html", {"form": form})
-
-
-def new_campaign(request):
-    # if this is a POST request we need to process the form data
-    if request.method == "POST":
-        # create a form instance and populate it with data from the request:
-        form = CampaignForm(request.POST)
-        # check whether it"s valid:
-        if form.is_valid():
-            # process the data in form.cleaned_data as required
-            campaign_request = CampaignRequest.objects.create(campaign_name=form.cleaned_data["campaign_name"],
-                                                              campaign_text=form.cleaned_data["campaign_text"])
-            campaign_request.save()
-            # redirect to a new URL:
-            return HttpResponseRedirect("/thanks/")
-    # if a GET (or any other method) we"ll create a blank form
-    else:
-        form = CampaignForm()
-
-    return render(request, "campaign_form.html", {"form": form})
