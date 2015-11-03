@@ -11,7 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template import RequestContext
-from rotator.models import UserSite, UserPixel
+from platform.models import UserSite, UserPixel
 
 
 
