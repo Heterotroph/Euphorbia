@@ -1,0 +1,71 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>{% block title %}{% endblock %}</title>
+
+	<!-- ui-base.css -->
+    <link href="/static/css/ui-base.css" rel="stylesheet" type="text/css" >
+
+    {% block css %}
+    {% endblock %}
+
+    {% block js %}
+    {% endblock %}
+
+
+</head>
+<html>
+	<body>
+
+		<script>{% block webix_data %}{% endblock %}</script>
+
+		<!--Серый див слева от лого DIV-->
+		<div class="left-gray-under-logo-div"></div>
+
+		<!--Основной DIV-->
+		<div class="ui-base-div">
+
+
+			<table class="ui-base-table">
+
+				<tr class="ui-base-logo-content-tr">
+
+					<!--Логотип-->
+					<td class="ui-base-logo-td">
+						<div class="ui-base-logo-div" id="leftLogoContainer">
+							<img src="/static/img/logos/euphorbia_logo_150x40.png">
+						</div>
+					</td>
+
+					<!--Контент-->
+					<td class="ui-base-content-td" rowspan="2">
+						<div class="ui-base-menu-content-div" id="сontentСontainer">{% block content %}{% endblock %}</div>
+						<div class="ui-base-footer-right-div"></div>
+					</td>
+
+				</tr>
+
+				<tr class="ui-base-leftmenu-tr">
+
+					<!--Левое меню-->
+					<td class="ui-base-leftmenu-td">
+						<div class="ui-base-menu-content-div" id="leftMenuContainer">{% block menu %}{% endblock %}</div>
+					</td>
+
+				</tr>
+
+			</table>
+
+
+		</div>
+
+		<script>{% block webix_code %}{% endblock %}</script>
+
+	</body>
+</html>
