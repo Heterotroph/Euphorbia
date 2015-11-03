@@ -15,6 +15,8 @@
 
 {% endblock %}
 
+
+
 {% block js %}
 
 	<!-- jQuery -->
@@ -30,6 +32,7 @@
     <script src="/static/libs/webix/codebase/webix.js"></script>
 
 {% endblock %}
+
 
 
 {% block webix_data %}
@@ -51,18 +54,22 @@ var contentData = {
 
 	"visitChartData": {{ views_chart_data|safe }},
 	"visitChartLegendData": [{text:"Общее число посещений",color:"#a7ee70"},{text:"Уникальные поситители",color:"#36abee"}],
-	"visitChartYAxis":{{ views_chart_axis_steps|safe }},
+	//"visitChartYAxis":{{ views_chart_axis_steps|safe }},
 
 	"timeChartData": {{ time_chart_data|safe }},
 	"timeChartLegendData": [{text:"Среднее время на сайте",color:"#a7ee70"},{text:"Среднее время активности",color:"#36abee"}],
-	"timeChartYAxis": {{ time_chart_axis_steps|safe }},
+	//"timeChartYAxis": {{ time_chart_axis_steps|safe }},
 
 };
 
 {% endblock %}
 
-{% block menu %}<div class="ui-base-menu-inner-div" id="leftMenuContainerInner"></div>{% endblock %}
-{% block content %}<div class="ui-base-content-inner-div" id="contentContainerInner"></div>{% endblock %}
+
+
+{% block menu %}<div class="tracking-menu-inner-div" id="leftMenuContainerInner"></div>{% endblock %}
+{% block content %}<div class="tracking-content-inner-div" id="contentContainerInner"></div>{% endblock %}
+
+
 
 {% block webix_code %}
 

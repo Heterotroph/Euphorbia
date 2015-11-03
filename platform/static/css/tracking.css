@@ -25,9 +25,7 @@
 	background: #F0DCB6;
 }
 
-div.ui-base-content-inner-div {
-	margin-top: 30px;
-    margin-left: 20px;
+div.tracking-content-inner-div, div.tracking-menu-inner-div {
 }
 
 .webix_layout_toolbar.webix_toolbar {

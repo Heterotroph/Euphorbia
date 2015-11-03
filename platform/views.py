@@ -67,15 +67,20 @@ def tracking(request):
     time_chart_data = json.dumps(time_chart_data)
     time_chart_axis_steps = json.dumps(time_chart_axis_steps)
 
-    context = {"left_menu_data": left_menu_data, "left_menu_links": left_menu_links, "toolbar_dates": toolbar_dates,
-               "treetable_data": treetable_data, "sp_id_data": sp_id_data,"views_chart_data": views_chart_data,
-               "views_chart_axis_steps": views_chart_axis_steps, "time_chart_data": time_chart_data,
-               "time_chart_axis_steps": time_chart_axis_steps}
+    context = {
+        "left_menu_data": left_menu_data,
+        "left_menu_links": left_menu_links,
+        "toolbar_dates": toolbar_dates,
+        "treetable_data": treetable_data,
+        "sp_id_data": sp_id_data,
+        "views_chart_data": views_chart_data,
+        "time_chart_data": time_chart_data
+        }
     return render_to_response("tracking.html", context, context_instance=RequestContext(request))
 
 
 #
-#   Обработка AJAX приходящих с PLATFORM.
+#   Обработка AJAX приходящих с tracking.
 #
 def tracking_ajax(request):
     command = request.GET.get("command")

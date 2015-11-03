@@ -49,7 +49,6 @@ td.ui-base-logo-td {
 
 td.ui-base-content-td {
 	width: 902px;
-	height: 80px;
 	padding: 0px;
 	background-color: #ffffff;
 }
@@ -70,14 +69,14 @@ div.ui-base-logo-div {
 	text-align: center;
 }
 
-div.ui-base-menu-content-div {
-	border: 0;
+div.ui-base-content-div {
+	margin-top: 30px;
+	margin-left: 20px;
 	margin-bottom: 40px;
+	border: 0;
 }
 
-div.ui-base-footer-right-div {
-	width: 100%;
-	height: 200px;
+div.ui-base-menu-div {
+	margin-top: 20px;
 	border: 0;
-	background-color: #666666;
 }
