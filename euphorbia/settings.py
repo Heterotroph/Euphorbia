@@ -114,5 +114,6 @@ STATICFILES_DIRS = [
 
 import django.contrib.auth
 
-django.contrib.auth.LOGIN_URL = '/platform/login/'
+django.contrib.auth.LOGIN_URL = "/platform/login/"
+LOGIN_URL = "/platform/login/"
 LOGIN_REDIRECT_URL = "/platform/profile/"
