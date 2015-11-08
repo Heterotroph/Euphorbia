@@ -1,26 +1,28 @@
 {% load staticfiles %}
 <!DOCTYPE html>
-<head>
-
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-
-    <title>{% block title %}{% endblock %}</title>
-
-	<!-- ui-base.css -->
-    <link href="/static/css/ui-base.css" rel="stylesheet" type="text/css" >
-
-    {% block css %}
-    {% endblock %}
-
-    {% block js %}
-    {% endblock %}
-
-
-</head>
 <html>
+
+	<head>
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<title>{% block title %}Платформа{% endblock %}</title>
+
+		<!-- ui-base.css -->
+		<link href="/static/css/ui-base.css" rel="stylesheet" type="text/css" >
+
+		{% block css %}
+		{% endblock %}
+
+		{% block js %}
+		{% endblock %}
+
+
+	</head>
+
 	<body>
 
 		<script>{% block webix_data %}{% endblock %}</script>
@@ -38,9 +40,11 @@
 
 					<!--Логотип-->
 					<td class="ui-base-logo-td">
+						<a href="/">
 						<div class="ui-base-logo-div" id="leftLogoContainer">
 							<img src="/static/img/logos/euphorbia_logo_150x40.png">
 						</div>
+						</a>
 					</td>
 
 					<!--Контент-->
@@ -67,4 +71,5 @@
 		<script>{% block webix_code %}{% endblock %}</script>
 
 	</body>
+
 </html>

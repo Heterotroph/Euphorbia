@@ -165,7 +165,7 @@ var contentData = {
 				reqData["command"] = "get_refresh_data";
 				reqData[currentSPKey] = currentSPID;
 			$.ajax({
-				url: "../tracking_ajax/",
+				url: "/platform/tracking_ajax/",
 				type: "get",
 				data: reqData,
 				success: function(response) {
@@ -202,7 +202,7 @@ var contentData = {
 				reqData[spKey] = spID;
 
 			$.ajax({
-				url: "../tracking_ajax/",
+				url: "/platform/tracking_ajax/",
 				type: "get",
 				data: reqData,
 				success: function(response) {

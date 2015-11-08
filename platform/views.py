@@ -15,21 +15,40 @@ from platform.models import UserSite, UserPixel
 
 
 
-@login_required
-def home(request):
-    return HttpResponseRedirect("/platform/tracking/")
-
-
-
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect("/")
-
 #
 #   -||-||-||-||-||-
 #    PLATFORM VIEWS
 #   -||-||-||-||-||-
 #
+
+
+#
+#   Вход, регистрация и т.п.
+#
+#   Страница входа, login. => django.contrib.auth.views.login
+#
+
+
+#
+#   Страница регистрации
+#
+def register(request):
+    return render_to_response("register.html")
+
+
+#
+#   Выход
+#
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect("/")
+
+#
+#   Страница профиля
+#
+@login_required
+def profile(request):
+    return HttpResponseRedirect("/platform/tracking/")
 
 
 #
@@ -51,11 +70,11 @@ def tracking(request):
 
     # Данные для графика показов
     views_chart_data = get_views_data(treetable_data[0]["spID"], None)
-    views_chart_axis_steps = get_views_steps(views_chart_data, ["views", "reqs"])
+    #views_chart_axis_steps = get_views_steps(views_chart_data, ["views", "reqs"])
 
     # Данные для графика времени посещений
     time_chart_data = get_time_data(treetable_data[0]["spID"], None)
-    time_chart_axis_steps = get_views_steps(time_chart_data, ["active", "total"])
+    #time_chart_axis_steps = get_views_steps(time_chart_data, ["active", "total"])
 
     # Ликвидация экранирования
     left_menu_data = json.dumps(left_menu_data)
@@ -63,9 +82,9 @@ def tracking(request):
     toolbar_dates = json.dumps(toolbar_dates)
     treetable_data = json.dumps(treetable_data)
     views_chart_data = json.dumps(views_chart_data)
-    views_chart_axis_steps = json.dumps(views_chart_axis_steps)
+    #views_chart_axis_steps = json.dumps(views_chart_axis_steps)
     time_chart_data = json.dumps(time_chart_data)
-    time_chart_axis_steps = json.dumps(time_chart_axis_steps)
+    #time_chart_axis_steps = json.dumps(time_chart_axis_steps)
 
     context = {
         "left_menu_data": left_menu_data,
@@ -73,6 +92,8 @@ def tracking(request):
         "toolbar_dates": toolbar_dates,
         "treetable_data": treetable_data,
         "sp_id_data": sp_id_data,
+        #"views_chart_axis_steps": views_chart_axis_steps,
+        #"time_chart_axis_steps": time_chart_axis_steps,
         "views_chart_data": views_chart_data,
         "time_chart_data": time_chart_data
         }
@@ -99,19 +120,19 @@ def get_site_data(request):
 
     # Данные для графика показов
     views_chart_data = get_views_data_request(request)
-    views_chart_axis_steps = get_views_steps(views_chart_data, ["views", "reqs"])
+    #views_chart_axis_steps = get_views_steps(views_chart_data, ["views", "reqs"])
 
     # Данные для графика времени посещений
     time_chart_data = get_time_data_request(request)
-    time_chart_axis_steps = get_views_steps(time_chart_data, ["active", "total"])
+    #time_chart_axis_steps = get_views_steps(time_chart_data, ["active", "total"])
 
     sp_name = get_sp_name(request)
 
     result = {
         "visitChartData": views_chart_data,
-        "visitChartYAxis": views_chart_axis_steps,
+        #"visitChartYAxis": views_chart_axis_steps,
         "timeChartData": time_chart_data,
-        "timeChartYAxis": time_chart_axis_steps,
+        #"timeChartYAxis": time_chart_axis_steps,
         "spName": sp_name
     }
 
@@ -121,11 +142,14 @@ def get_site_data(request):
 #   Обработка "обновить" (AJAX)
 #
 def get_refresh_data(request):
+
     views_time_data = get_site_data(request)
     treetable_data, sp_id_data = get_sites(request)
+
     views_time_data["trackTreetableData"] = treetable_data
     views_time_data["spIDData"] = sp_id_data
     views_time_data["toolbarDates"] = get_toolbar_dates(request)
+
     return views_time_data
 
 
@@ -344,7 +368,7 @@ def get_menu_links(request):
            "/platform/sites/",
            "/platform/advert/",
            "/platform/profile/",
-           "/logout"]
+           "/platform/logout"]
     return arr
 
 
@@ -388,7 +412,3 @@ def time_presentation(seconds, prefix0="", prefix1=""):
         return "{:2.0f}".format(seconds) + prefix0
     else:
         return to_hms(seconds) + prefix1
-
-
-
-
