@@ -77,7 +77,7 @@ def tracking(request):
     time_chart_data = get_time_data(treetable_data[0]["spID"], None) if len(treetable_data)>0 else []
     #time_chart_axis_steps = get_views_steps(time_chart_data, ["active", "total"])
 
-    # Ликвидация экранирования
+
     left_menu_data = json.dumps(left_menu_data)
     left_menu_links = json.dumps(left_menu_links)
     toolbar_dates = json.dumps(toolbar_dates)

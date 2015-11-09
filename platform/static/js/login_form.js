@@ -3,7 +3,7 @@ function buildLoginForm(containerID, registerCallback, loginCallback) {
         view: "form",
         id: "loginFormID",
         container: containerID,
-        width: 500,
+        width: 480,
         height: 200,
         elements:[
 

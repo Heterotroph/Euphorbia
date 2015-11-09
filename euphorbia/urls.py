@@ -5,11 +5,9 @@ from django.contrib.auth import views
 
 
 urlpatterns = patterns('',
-    url(r'^$',anonymous_required(views.login)),
-    url(r'^accounts/profile/', home),
-    url(r'^logout/$', logout_view),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^platform/', include('platform.urls', namespace="platform")),
-    url(r'^/', include('platform.urls', namespace="platform")),
-                       )
-
+        url(r'^$',anonymous_required(views.login)),
+        url(r'^logout/$', logout_view),
+        url(r'^admin/', include(admin.site.urls)),
+        url(r'^platform/', include('platform.urls', namespace="platform")),
+        url(r'^/', include('platform.urls', namespace="platform")),
+    )
