@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <h1>REGISTRATION</h1>
+     {{form.non_field_errors}}
+    <form method="POST" action="">
+        {% csrf_token %}
+        <div>
+        <span>EMAIL *</span><br>
+        <input type="email" id="email" name="email" value="{{form.email.value}}"><br>
+        {{ form.email.errors }}
+        </div><br>
+        <div>
+        <span>PASSWORD *</span><br>
+        <input type="password" id="password" name="password" value=""><br>
+        {{ form.password.errors }}
+        </div><br>
+        <div>
+        <span>PHONE *</span><br>
+        <input type="text" id="phone" name="phone" value="{{form.phone.value}}"><br>
+        {{ form.phone.errors }}
+        </div><br>
+        <div>
+        <span>TYPE *</span><br>
+        <select name="role">
+            <option value="0"  {% if form.cleaned_data.role != 1 %} selected {% endif %}>Advertiser</option>
+            <option value="1" {% if form.cleaned_data.role == 1 %} selected {% endif %}>Publisher</option>
+        </select><br>
+        {{ form.role.errors }}
+        </div><br>
+        <input type="submit" value="ЗАРЕГИСТРИРОВАТЬСЯ">
+    </form>
+</body>
+</html>

@@ -11,19 +11,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template import RequestContext
+from django.template.backends import django
 from platform.models import UserSite, UserPixel
 
-
-
-@login_required
-def home(request):
-    return HttpResponseRedirect("/platform/tracking/")
-
-
-
-def logout_view(request):
-    logout(request)
-    return HttpResponseRedirect("/")
 
 #
 #   -||-||-||-||-||-
