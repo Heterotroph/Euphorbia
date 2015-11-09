@@ -15,7 +15,7 @@ urlpatterns = patterns('',
         url(r'^advert/', tracking),
 
         url(r'^register/',  anonymous_required(RegisterView.as_view())),
-        url(r'^login/', 'django.contrib.auth.views.login', {"template_name": "registration/login.html"}),
+        url(r'^login/', anonymous_required('django.contrib.auth.views.login'), {"template_name": "registration/login.html"}),
         url(r'^logout/', logout_view),
         url(r'^register/', register)
     )
