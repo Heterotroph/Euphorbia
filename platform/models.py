@@ -1,7 +1,7 @@
 from datetime import datetime
 import uuid
 from django.db import models
-from django.contrib.auth.models import User
+from users.models import User
 from  django.contrib.postgres.fields import ArrayField
 __author__ = 'igorzygin'
 

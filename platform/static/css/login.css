@@ -1,0 +1,60 @@
+div.login-div {
+    width: 502px;
+    float: right;
+}
+
+div.login-head-div {
+    width: 502px;
+    height: 46px;
+    padding-top: 8px;
+    margin: 0 auto;
+    margin-bottom: 14px;
+    background-color: #ff4040;
+    color: #ffffff;
+    font-size: 15px;
+    font-family: "PT Sans", Tahoma;
+    border: 1px solid #ddd;
+    outline: 0;
+}
+
+div.login-head-div-2 {
+    width: 502px;
+    height: 46px;
+    padding-top: 8px;
+    margin: 0 auto;
+    margin-bottom: 14px;
+    background-color: #333333;
+    color: #ffffff;
+    font-size: 15px;
+    font-family: "PT Sans", Tahoma;
+    border: 1px solid #ddd;
+    outline: 0;
+}
+
+div.stuff-div {
+    width: 502px;
+    height: 100%;
+    max-height: 236px;
+    padding: 17px;
+    text-align: left;
+    border: 1px solid #ddd;
+    font-size: 13px;
+    font-family: "PT Sans", Tahoma;
+    overflow-y: scroll;
+}
+
+div.left-div {
+    display: block;
+    float: left;
+    width: 49%;
+    height: 100%;
+    padding-right: 1%;
+}
+
+div.right-div {
+    display: block;
+    float: right;
+    width: 49%;
+    height: 100%;
+    padding-left: 1%;
+}

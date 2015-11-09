@@ -1,0 +1,81 @@
+{% extends "lr-base.html" %}
+{% block title %}Войти в платформу{% endblock %}
+
+{% block css %}
+
+    <!-- webix.css -->
+    <link href="/static/libs/webix/codebase/webix.css" rel="stylesheet" type="text/css" >
+
+    <!--login.css-->
+	<link href="/static/css/login.css" rel="stylesheet" type="text/css" >
+
+{% endblock %}
+
+{% block js %}
+
+    <!-- Webix JS Core -->
+    <script src="/static/libs/webix/codebase/webix.js"></script>
+
+    <!-- Webix JS Core -->
+    <script src="/static/js/login_form.js"></script>
+
+    <!-- jQuery -->
+	<script src="/static/libs/jquery-2.1.4.min.js"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="left-div">
+        <div class="login-div">
+            <form style="display: none;" id="formID" method="post" novalidate>
+                {% csrf_token %}
+                <input id="username" type="text" name="username" required>
+                <input id="password"  type="password" name="password" required>
+            </form>
+            <div>
+                {% if form.errors %}
+                    <div class="login-head-div">
+                        Поле E-mail или Password заполнены неверно,<br />попробуйте еще раз...
+                    </div>
+                {% else %}
+                    <div class="login-head-div-2">
+                        <img src="/static/img/logos/euphorbia_logo_150x40.png">
+                    </div>
+                {% endif %}
+                <div id="loginContainerID"></div>
+            </div>
+        </div>
+    </div>
+    <div class="right-div">
+        <div class="stuff-div">
+            <center><b>Текст оферты!</b></center>
+            <br />
+            Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. Nemo enim ipsam voluptatem, quia voluptas sit, aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos, qui ratione voluptatem sequi nesciunt, neque porro quisquam est, qui dolorem ipsum, quia dolor sit, amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt, ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit, qui in ea voluptate velit esse, quam nihil molestiae consequatur, vel illum, qui dolorem eum fugiat, quo voluptas nulla pariatur? At vero eos et accusamus et iusto odio dignissimos ducimus, qui blanditiis praesentium voluptatum deleniti atque corrupti, quos dolores et quas molestias excepturi sint, obcaecati cupiditate non provident, similique sunt in culpa, qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio, cumque nihil impedit, quo minus id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat.
+        </div>
+    </div>
+{% endblock %}
+
+{% block webix_code %}
+
+    buildLoginForm("loginContainerID", registerCallback, loginCallback);
+
+    webix.UIManager.addHotKey("enter", function(){
+        loginCallback();
+    });
+
+    function registerCallback() {
+        document.location.href = "/platform/register/"
+    }
+
+    function loginCallback() {
+        var user = $$("userValueID").getValue();
+        var pass = $$("passValueID").getValue();
+        $("#username").val(user);
+        $("#password").val(pass);
+        $$("loginFormID")
+
+        //if (webix.rules.isEmail(user)) {
+            $("#formID").submit();
+        //}
+    }
+{% endblock %}
