@@ -117,7 +117,8 @@ CLIENT_SECRET_KEY = [2,3,6,9,10,13,16,18,19,20,24,25,27,28,30,32,34,37,38,39]
 AUTH_PROFILE_MODULE = 'users.User'  # custom user
 AUTH_USER_MODEL = 'users.User'  # custom user
 
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
