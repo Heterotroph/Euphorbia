@@ -3,11 +3,13 @@ from euphorbia.views import anonymous_required
 from platform.views.other import tracking, tracking_ajax, profile, logout_view, register
 from platform.views.register import RegisterView
 from django.contrib.auth import views
+from django.views.generic import RedirectView
 
 __author__ = 'igorzygin'
 
 
 urlpatterns = patterns('',
+        url(r'^$', RedirectView.as_view(url='login/')),
         url(r'^profile/', profile),
 
         url(r'^tracking/', tracking),

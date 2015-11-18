@@ -59,7 +59,7 @@
 
     buildLoginForm("loginContainerID", registerCallback, loginCallback);
 
-    webix.UIManager.addHotKey("enter", function(){
+    webix.UIManager.addHotKey("enter", function() {
         loginCallback();
     });
 
@@ -74,8 +74,8 @@
         $("#password").val(pass);
         $$("loginFormID")
 
-        //if (webix.rules.isEmail(user)) {
+        if (webix.rules.isEmail(user)) {
             $("#formID").submit();
-        //}
+        }
     }
 {% endblock %}
