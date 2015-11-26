@@ -1,0 +1,20 @@
+
+{% block content %}
+ <section ng-app="siteApp">
+    <table>
+        <thead>
+        <td>ID</td><td>Имя</td><td>Количество баннеров</td><td>Ссылка</td>
+        </thead>
+        {% for site in sites_list %}
+            <tr>
+                <td>{{site.id}}</td>
+                <td>{{site.name}}</td>
+                <td>{{site.banner_set.all | length}}</td>
+                <td><a href="{{site.id}}/">Подробнее</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+     <a href="create/">Создать новый сайт</a>
+ </section>
+
+{% endblock %}

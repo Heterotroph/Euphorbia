@@ -1,0 +1,33 @@
+
+{% block content %}
+ <section ng-app="siteApp">
+                <span>ID</span>
+                <span>{{site.id}}</span><br>
+                <span>Создано</span>
+                <span>{{site.created}}</span><br>
+                <span>Имя</span>
+                <span>{{site.name}}</span><br>
+                <span>Количество рекламных мест</span>
+                <span>{{site.adspot_set.all | length}}</span><br>
+                <span>Тематика</span>
+                <span>{% for theme in site.thematics.all %}{{theme.name}}{% endfor %}</span>
+
+     <h1>
+         Рекламные места
+     </h1>
+     <table>
+        <thead>
+        <td>ID</td><td>Имя</td><td>Ссылка</td>
+        </thead>
+        {% for adspot in site.adspot_set.all %}
+            <tr>
+                <td>{{adspot.id}}</td>
+                <td>{{adspot.name}}</td>
+                <td><a href="/platform/adspots/{{adspot.id}}/">Подробнее</a></td>
+            </tr>f
+        {% endfor %}
+    </table>
+     <a href="/platform/adspots/create/">Создать новый адспот</a>
+ </section>
+
+{% endblock %}

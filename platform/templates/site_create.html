@@ -1,0 +1,20 @@
+
+{% block content %}
+ <section>
+    <form method="post" action="">
+        {% csrf_token %}
+        <input name="name" type="text" value="{{form.name.value}}"><br>
+        {{form.name.errors}}<br>
+        <input name="url" type="text" value="{{form.url.value}}"><br>
+        {{form.url.errors}}<br>
+        <select multiple name="thematics">
+            {% for them in thematics_choice %}
+                <option value="{{them.id}}" {%if them.id in form.thematics.value%}selected{%endif%}>{{them.name}}</option>
+            {% endfor %}
+        </select><br>
+        <!--<input name="thematics" type="text" value="{{form.thematics.value}}">-->
+        {{form.thematics.errors}}
+        <input type="submit" value="Submit">
+    </form>
+ </section>
+{% endblock %}

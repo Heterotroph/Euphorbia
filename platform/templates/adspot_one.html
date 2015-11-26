@@ -1,0 +1,16 @@
+
+{% block content %}
+ <section ng-app="siteApp">
+                <span>ID</span>
+                <span>{{adspot.id}}</span><br>
+                <span>Создано</span>
+                <span>{{adspot.created}}</span><br>
+                <span>Имя</span>
+                <span>{{adspot.name}}</span><br>
+                <span>Форматы </span>
+                <span>{% for format in adspot.format.all %}{{format.name}}{% endfor %}</span>
+                <span>HTML-code</span>
+                <span>{{adspot.html_code}}</span>
+ </section>
+
+{% endblock %}

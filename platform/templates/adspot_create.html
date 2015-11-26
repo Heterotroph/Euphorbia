@@ -1,0 +1,24 @@
+
+{% block content %}
+ <section>
+    <form method="post" action="">
+        {% csrf_token %}
+        <input name="name" type="text" value="{{form.name.value}}"><br>
+        {{form.name.errors}}<br>
+        <select name="site">
+            {% for site in site_choice %}
+                <option value="{{site.id}}" {%if site.id == form.site.value.id%}selected{%endif%}>{{site.name}}</option>
+            {% endfor %}
+        </select><br>
+        {{form.site.errors}}<br>
+        <select multiple name="format">
+            {% for format in format_choice %}
+                <option value="{{format.id}}" {%if format.id|stringformat:"i" in form.format.value%}selected{%endif%}>{{format.name}}</option>
+            {% endfor %}
+        </select><br>
+        <!--<input name="thematics" type="text" value="{{form.thematics.value}}">-->
+        {{form.format.errors}}
+        <input type="submit" value="Submit">
+    </form>
+ </section>
+{% endblock %}

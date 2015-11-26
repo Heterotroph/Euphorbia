@@ -16,6 +16,13 @@ class AdThematics(models.Model):
     name = models.CharField(max_length=100, blank=False)
 
 
+class AdFormat(models.Model):
+    def __unicode__(self):
+        return self.name
+    created = models.DateTimeField(default=datetime.now)
+    name = models.CharField(max_length=100, blank=False)
+
+
 class UserSite(models.Model):
     def __unicode__(self):
         return self.name+" "+self.url
@@ -34,9 +41,6 @@ class UserPixel(models.Model):
     unique_code = models.CharField(max_length=300, unique=True, default=generate_unique_code)
 
 
-
-
-
 class AdSpot(models.Model):
     def __unicode__(self):
         return self.name+" "+self.unique_code
@@ -44,9 +48,10 @@ class AdSpot(models.Model):
     name = models.CharField(max_length=100, unique=True)
     unique_code = models.CharField(max_length=300, unique=True, default=generate_unique_code)
     site = models.ForeignKey(UserSite)
-    format = ArrayField(models.SmallIntegerField(blank=True),size=8,)
+    format = models.ManyToManyField(AdFormat, max_length=3, blank=False)
 
-
+    def html_code(self):
+        return self.unique_code
 
 
 class Campaign(models.Model):
@@ -57,13 +62,15 @@ class Campaign(models.Model):
     user = models.ForeignKey(User, unique=False)
     thematics = models.ManyToManyField(AdThematics, blank=True)
 
+
 class Banner(models.Model):
     def __unicode__(self):
         return self.campaign.name+" "+str(self.id)+" "+str(self.format)
     created = models.DateTimeField(default=datetime.now)
     campaign = models.ForeignKey(Campaign)
     image = models.ImageField()
-    format = models.SmallIntegerField(blank=False)
+    format = models.ForeignKey(AdFormat, blank=False, null=False)
+    url = models.CharField(max_length=255, blank=False, null=False)
 
 
 
