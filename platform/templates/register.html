@@ -34,7 +34,7 @@
         {% csrf_token %}
         <div>
         <span>EMAIL *</span><br>
-        <input type="email" id="email" name="email" value="{{form.email.value}}"><br>
+        <input type="email" id="email" name="email" value="{{form.email.value|default_if_none:""}}"><br>
         {{ form.email.errors }}
         </div><br>
         <div>
@@ -44,7 +44,7 @@
         </div><br>
         <div>
         <span>PHONE *</span><br>
-        <input type="text" id="phone" name="phone" value="{{form.phone.value}}"><br>
+        <input type="text" id="phone" name="phone" value="{{form.phone.value|default_if_none:""}}"><br>
         {{ form.phone.errors }}
         </div><br>
         <div>

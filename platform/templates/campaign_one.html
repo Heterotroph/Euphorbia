@@ -1,0 +1,34 @@
+
+{% block content %}
+ <section ng-app="siteApp">
+                <span>ID</span>
+                <span>{{campaign.id}}</span><br>
+                <span>Создано</span>
+                <span>{{campaign.created}}</span><br>
+                <span>Имя</span>
+                <span>{{campaign.name}}</span><br>
+                <span>Количество баннеров</span>
+                <span>{{campaign.banner_set.all | length}}</span><br>
+                <span>Тематика</span>
+                <span>{% for theme in campaign.thematics.all %}{{theme.name}}{% endfor %}</span>
+
+     <h1>
+         Баннеры
+     </h1>
+     <table>
+        <thead>
+        <td>ID</td><td>Имя</td><td>Изображение</td><td>Ссылка</td>
+        </thead>
+        {% for banner in campaign.banner_set.all %}
+            <tr>
+                <td>{{banner.id}}</td>
+                <td>{{banner.name}}</td>
+                <td><img src="/static/{{banner.get_image_link}}"></td>
+                <td><a href="{{banner.url}}/">Подробнее</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+     <a href="/platform/banner/create/">Создать новый баннер</a>
+ </section>
+
+{% endblock %}

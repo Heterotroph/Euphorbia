@@ -1,0 +1,25 @@
+
+{% block content %}
+ <section>
+    <form method="post" action="" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input name="url" type="text" value="{{form.url.value|default_if_none:""}}"><br>
+        {{form.url.errors}}<br>
+        <select name="campaign">
+            {% for campaign in campaign_choice %}
+                <option value="{{campaign.id}}" {%if campaign.id == form.campaign.value.id%}selected{%endif%}>{{campaign.name}}</option>
+            {% endfor %}
+        </select><br>
+        {{form.campaign.errors}}<br>
+        <select name="format">
+            {% for format in format_choice %}
+                <option value="{{format.id}}" {%if format.id == form.format.value.id%}selected{%endif%}>{{format.name}}</option>
+            {% endfor %}
+        </select><br>
+        {{form.format.errors}}<br>
+        <input type="file" name="image" accept="image/*,image/jpeg">
+        {{form.image.errors}}<br>
+        <input type="submit" value="Submit">
+    </form>
+ </section>
+{% endblock %}

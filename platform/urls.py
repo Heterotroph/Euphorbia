@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
 from euphorbia.views import anonymous_required
 from platform.views.adspots import OneAdspotView, CreateAdspotView
+from platform.views.banners import CreateBannerView
+from platform.views.campaigns import CampaignsView, CreateCampaignView, OneCampaignView
 from platform.views.other import tracking, tracking_ajax, profile, logout_view, register
 from platform.views.register import RegisterView
 from django.contrib.auth import views
@@ -16,12 +18,19 @@ urlpatterns = patterns('',
 
         url(r'^tracking/', tracking),
         url(r'^tracking_ajax/', tracking_ajax),
+
         url(r'^sites/create/$', CreateSiteView.as_view()),
         url(r'^sites/(?P<pk>\d+)/$', OneSiteView.as_view()),
         url(r'^sites/', SitesView.as_view()),
 
         url(r'^adspots/create/$', CreateAdspotView.as_view()),
         url(r'^adspots/(?P<pk>\d+)/$', OneAdspotView.as_view()),
+
+        url(r'^campaigns/create/$', CreateCampaignView.as_view()),
+        url(r'^campaigns/(?P<pk>\d+)/$', OneCampaignView.as_view()),
+        url(r'^campaigns/', CampaignsView.as_view()),
+
+        url(r'^banner/create/$', CreateBannerView.as_view()),
 
         url(r'^advert/', tracking),
 

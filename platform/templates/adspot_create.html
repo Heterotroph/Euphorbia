@@ -3,7 +3,7 @@
  <section>
     <form method="post" action="">
         {% csrf_token %}
-        <input name="name" type="text" value="{{form.name.value}}"><br>
+        <input name="name" type="text" value="{{form.name.value|default_if_none:""}}"><br>
         {{form.name.errors}}<br>
         <select name="site">
             {% for site in site_choice %}

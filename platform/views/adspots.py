@@ -55,10 +55,13 @@ class CreateAdspotView(LoginRequiredMixin, FormView):
         else:
             return self.render_to_response({"form": form, "format_choice":self.get_format(request), "site_choice":self.get_sites(request)})
 #
-class AdspotForm(forms.Form):
-    name = forms.CharField(max_length=100, required=True,validators=[validate_adspot_name])
-    site = forms.ModelChoiceField(queryset=UserSite.objects.all(), required=True)
-    format = forms.ModelMultipleChoiceField(queryset=AdFormat.objects.all(),required=True)
+class AdspotForm(forms.ModelForm):
+    class Meta:
+        fields = ['name','site','format']
+        model = AdSpot
+    # name = forms.CharField(max_length=100, required=True,validators=[validate_adspot_name])
+    # site = forms.ModelChoiceField(queryset=UserSite.objects.all(), required=True)
+    # format = forms.ModelMultipleChoiceField(queryset=AdFormat.objects.all(),required=True)
 
 #
 

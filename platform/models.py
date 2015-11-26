@@ -72,6 +72,9 @@ class Banner(models.Model):
     format = models.ForeignKey(AdFormat, blank=False, null=False)
     url = models.CharField(max_length=255, blank=False, null=False)
 
+    def get_image_link(self):
+        return self.image
+
 
 
 

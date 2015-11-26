@@ -5,8 +5,6 @@
         {% csrf_token %}
         <input name="name" type="text" value="{{form.name.value|default_if_none:""}}"><br>
         {{form.name.errors}}<br>
-        <input name="url" type="text" value="{{form.url.value|default_if_none:""}}"><br>
-        {{form.url.errors}}<br>
         <select multiple name="thematics">
             {% for them in thematics_choice %}
                 <option value="{{them.id}}" {%if them.id in form.thematics.value%}selected{%endif%}>{{them.name}}</option>

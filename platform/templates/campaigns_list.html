@@ -1,0 +1,20 @@
+
+{% block content %}
+ <section ng-app="siteApp">
+    <table>
+        <thead>
+        <td>ID</td><td>Имя</td><td>Количество баннеров</td><td>Ссылка</td>
+        </thead>
+        {% for campaign in campaigns_list %}
+            <tr>
+                <td>{{campaign.id}}</td>
+                <td>{{campaign.name}}</td>
+                <td>{{campaign.banner_set.all | length}}</td>
+                <td><a href="{{campaign.id}}/">Подробнее</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+     <a href="create/">Создать новую кампанию</a>
+ </section>
+
+{% endblock %}
