@@ -4,6 +4,7 @@ import json
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.core.files.images import get_image_dimensions
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView
 from platform.models import UserSite, AdSpot, AdThematics, AdFormat, Campaign, Banner
@@ -59,6 +60,28 @@ class BannerForm(forms.ModelForm):
     class Meta:
         fields = ['campaign','url','format','image']
         model = Banner
+
+
+    def clean_image(self):
+       image = self.cleaned_data.get("image")
+       if not image:
+           raise forms.ValidationError("No image!")
+       else:
+
+           req_width = 315
+           req_height = 300
+           if self.cleaned_data["format"].id == 1:
+                req_width = 315
+                req_height = 300
+           elif self.cleaned_data["format"].id == 2:
+                req_width = 300
+                req_height = 250
+           w, h = get_image_dimensions(image)
+           if w != req_width:
+               raise forms.ValidationError("The image is %i pixel wide. It's supposed to be %i px" % (w, req_width))
+           if h != req_height:
+               raise forms.ValidationError("The image is %i pixel high. It's supposed to be %i px" % (h, req_height))
+       return image
     # name = forms.CharField(max_length=100, required=True,validators=[validate_adspot_name])
     # site = forms.ModelChoiceField(queryset=UserSite.objects.all(), required=True)
     # format = forms.ModelMultipleChoiceField(queryset=AdFormat.objects.all(),required=True)
