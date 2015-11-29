@@ -8,6 +8,7 @@ from django.core.files.images import get_image_dimensions
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView
 from platform.models import UserSite, AdSpot, AdThematics, AdFormat, Campaign, Banner
+from platform.views.other import get_data_from_sql
 from platform.views.sites import LoginRequiredMixin
 
 __author__ = 'igorzygin'
@@ -89,6 +90,23 @@ class BannerForm(forms.ModelForm):
 #
 
 
+def get_campaign_stats(campaign_id_list):
+    campaign_id_string = ','.join(campaign_id_list)
+    query = 'select pc.id as campaign_id, CURRENT_DATE - s.a AS date, count(DISTINCT bss.id), count(DISTINCT bcc.id) \
+            from platform_campaign as pc \
+            inner join platform_banner as pb \
+            on pb.campaign_id = pc.id \
+            inner join \
+            Generate_series(0, 30, 1) AS s(a) \
+            On true \
+            LEFT JOIN banner_show_stats as bss \
+            ON date(bss.created)=CURRENT_DATE - s.a and bss.banner_id=pb.id \
+            LEFT JOIN banner_clicks as bcc \
+            On date(bcc.created)=CURRENT_DATE - s.a AND bcc.banner_id=pb.id \
+            WHERE pc.id in (1,3) \
+            GROUP BY pc.id, CURRENT_DATE - s.a;' % campaign_id_string
+    data = get_data_from_sql(query)
+    return data
 # def get_sites(request):
 #     sites = UserSite.objects.filter(user=request.user)
 #     return json.dumps(sites)

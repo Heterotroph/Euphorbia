@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView, FormView
 from platform.models import UserSite, AdSpot, AdThematics
+from platform.views.other import get_data_from_sql
 
 __author__ = 'igorzygin'
 
@@ -83,3 +84,24 @@ class SiteForm(forms.Form):
     name = forms.CharField(max_length=100, required=True)
     url = forms.CharField(max_length=100, required=True)
     thematics = forms.ModelMultipleChoiceField(queryset=AdThematics.objects.all(),required=True)
+
+
+
+
+def get_site_stats(site_id_list):
+    site_id_string = ','.join(site_id_list)
+    query = 'select pus.id, CURRENT_DATE - s.a AS date, count(DISTINCT bss.id), count(DISTINCT bcc.id) \
+            from platform_usersite as pus \
+            inner join \
+            Generate_series(0, 30, 1) AS s(a) \
+            On true \
+            LEFT JOIN platform_adspot as pa \
+            ON pa.site_id=pus.id \
+            LEFT JOIN banner_show_stats as bss \
+            ON date(bss.created)=CURRENT_DATE - s.a and bss.spot_code=pa.unique_code \
+            LEFT JOIN banner_clicks as bcc \
+            On date(bcc.created)=CURRENT_DATE - s.a AND bcc.spot_code=pa.unique_code \
+            WHERE pus.id in (%s) \
+            GROUP BY pus.id, CURRENT_DATE - s.a' % site_id_string
+    data = get_data_from_sql(query)
+    return data
