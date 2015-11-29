@@ -1,4 +1,35 @@
+{% extends "ui-base.html" %}
+{% block title %}Кампании{% endblock %}
 
+
+{% block css %}
+
+    <!-- webix.css -->
+    <link href="/static/libs/webix/codebase/webix.css" rel="stylesheet" type="text/css" >
+
+	<!-- tracking.css -->
+    <link href="/static/css/tracking.css" rel="stylesheet" type="text/css" >
+
+	<!--left-menu.css-->
+	<link href="/static/css/left-menu.css" rel="stylesheet" type="text/css" >
+
+{% endblock %}
+{% block js %}
+
+	<!-- jQuery -->
+	<script src="/static/libs/jquery-2.1.4.min.js"></script>
+
+    <!-- left_menu.js -->
+    <script src="/static/js/left_menu.js"></script>
+
+    <!-- Webix JS Core -->
+    <script src="/static/libs/webix/codebase/webix.js"></script>
+
+{% endblock %}
+
+
+
+{% block menu %}<div class="tracking-menu-inner-div" id="leftMenuContainerInner"></div>{% endblock %}
 {% block content %}
  <section ng-app="siteApp">
     <table>

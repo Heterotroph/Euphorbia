@@ -266,11 +266,20 @@ def get_views_data(site_id, page_id):
         pixel = UserPixel.objects.get(pk=page_id)
         pixel_code_list = [pixel.unique_code]
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
-    query = "SELECT date(created) as date, count(session_id) as visits, count(DISTINCT local_user_id) as unique_visits \
-                    FROM page_sessions_link \
-                    WHERE os != 'NULL' AND browser  != 'NULL' AND page_unique_code in (%s) \
-                    GROUP BY date(created) \
-                    ORDER BY date(created)" % pixel_code_list_str
+    query = "SELECT CURRENT_DATE - s.a AS date, \
+       COALESCE(visits, 0) as visits,  \
+       COALESCE(unique_visits, 0) as unique_visits \
+FROM   Generate_series(0, 30, 1) AS s(a) \
+       LEFT JOIN (SELECT Date(created)                 AS date, \
+                         Count(session_id)             AS visits, \
+                         Count(DISTINCT local_user_id) AS unique_visits \
+                  FROM   page_sessions_link  \
+                  WHERE  os != 'NULL'  \
+                         AND browser != 'NULL' \
+                         AND page_unique_code IN ( %s ) \
+                  GROUP  BY Date(created)  \
+                  ORDER  BY Date(created)) AS data_table \
+              ON CURRENT_DATE - s.a = data_table.date;" % pixel_code_list_str
     data = get_data_from_sql(query)
 
     counter = 0
@@ -303,11 +312,21 @@ def get_time_data(site_id, page_id):
         pixel = UserPixel.objects.get(pk=page_id)
         pixel_code_list = [pixel.unique_code]
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
-    query = "SELECT date(created) as date, median(coalesce(active_time, 0)) as active, median(EXTRACT(EPOCH from (coalesce(session_updated, created) - created))) as total \
-                    FROM page_sessions_link \
-                    WHERE os != 'NULL' AND browser  != 'NULL' AND page_unique_code in (%s) \
-                    GROUP BY date(created) \
-                    ORDER BY date(created)" % pixel_code_list_str
+    query = "SELECT CURRENT_DATE - s.a AS date, \
+       COALESCE(active, 0) as active, \
+       COALESCE(total, 0) as total \
+FROM   Generate_series(0, 30, 1) AS s(a) \
+       LEFT JOIN (SELECT Date(created) AS date, \
+                         Median(COALESCE(active_time, 0)) AS active, \
+                         Median(Extract(epoch FROM ( COALESCE(session_updated, created) - created))) AS total \
+                  FROM   page_sessions_link  \
+                  WHERE  os != 'NULL'  \
+                         AND browser != 'NULL' \
+                         AND page_unique_code IN ( %s ) \
+                  GROUP  BY Date(created)  \
+                  ORDER  BY Date(created)) AS data_table \
+              ON CURRENT_DATE - s.a = data_table.date; " % pixel_code_list_str
+    print query
     data = get_data_from_sql(query)
 
     counter = 0

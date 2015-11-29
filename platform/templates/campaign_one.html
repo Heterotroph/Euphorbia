@@ -1,4 +1,19 @@
+{% extends "ui-base.html" %}
+{% block title %}Кампания {{campaign.id}}{% endblock %}
 
+
+{% block css %}
+
+    <!-- webix.css -->
+    <link href="/static/libs/webix/codebase/webix.css" rel="stylesheet" type="text/css" >
+
+	<!-- tracking.css -->
+    <link href="/static/css/tracking.css" rel="stylesheet" type="text/css" >
+
+	<!--left-menu.css-->
+	<link href="/static/css/left-menu.css" rel="stylesheet" type="text/css" >
+
+{% endblock %}
 {% block content %}
  <section ng-app="siteApp">
                 <span>ID</span>
