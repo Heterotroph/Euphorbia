@@ -68,12 +68,12 @@ class Banner(models.Model):
         return self.campaign.name+" "+str(self.id)+" "+str(self.format)
     created = models.DateTimeField(default=datetime.now)
     campaign = models.ForeignKey(Campaign)
-    image = models.ImageField()
+    image = models.ImageField(upload_to='b/')
     format = models.ForeignKey(AdFormat, blank=False, null=False)
     url = models.CharField(max_length=255, blank=False, null=False)
 
     def get_image_link(self):
-        return self.image
+        return '/media/%s' % self.image
 
 
 
