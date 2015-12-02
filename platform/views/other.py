@@ -318,7 +318,7 @@ def get_time_data(site_id, page_id):
 FROM   Generate_series(0, 30, 1) AS s(a) \
        LEFT JOIN (SELECT Date(created) AS date, \
                          Median(COALESCE(active_time, 0)) AS active, \
-                         Median(Extract(epoch FROM ( COALESCE(session_updated, created) - created))) AS total \
+                         GREATEST(Median(Extract(epoch FROM ( COALESCE(session_updated, created) - created))),  Median(COALESCE(active_time, 0))) AS total \
                   FROM   page_sessions_link  \
                   WHERE  os != 'NULL'  \
                          AND browser != 'NULL' \
