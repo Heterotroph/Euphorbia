@@ -3,7 +3,6 @@
 *.iml
 *.pyc
 *.pyproj
-requirements.txt
 ## Directory-based project format:
 .idea/
 static_root/
