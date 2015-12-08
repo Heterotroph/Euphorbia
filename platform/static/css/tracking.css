@@ -25,7 +25,32 @@
 	background: #F0DCB6;
 }
 
-div.tracking-content-inner-div, div.tracking-menu-inner-div {
+div.tracking-content-inner-div {
+
+}
+
+div.tracking-menu-inner-div {
+
+}
+
+div.tracking-content-top-inner-div {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+div.tracking-content-top-inner-div-calendar {
+    position: relative;
+    top: 0px;
+    margin-bottom: -50px;
+    margin-top: 9px;
+    margin-left: 9px;
+    z-index: 999;
+    float: left;
+}
+
+div.tracking-content-top-inner-div-webix {
+    position: relative;
+    top: 0px;
 }
 
 .webix_layout_toolbar.webix_toolbar {

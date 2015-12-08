@@ -13,8 +13,11 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template import RequestContext
 from django.template.backends import django
 from platform.models import UserSite, UserPixel
+from datetime import date, timedelta
 
 
+default_from_days_ago = 6
+default_to_days_ago = 0;
 
 #
 #   -||-||-||-||-||-
@@ -70,11 +73,11 @@ def tracking(request):
     treetable_data, sp_id_data = get_sites(request)
 
     # Данные для графика показов
-    views_chart_data = get_views_data(treetable_data[0]["spID"], None) if len(treetable_data)>0 else []
+    views_chart_data = get_views_data(treetable_data[0]["spID"], None, 0, 0) if len(treetable_data)>0 else []
     #views_chart_axis_steps = get_views_steps(views_chart_data, ["views", "reqs"])
 
     # Данные для графика времени посещений
-    time_chart_data = get_time_data(treetable_data[0]["spID"], None) if len(treetable_data)>0 else []
+    time_chart_data = get_time_data(treetable_data[0]["spID"], None, 0, 0) if len(treetable_data)>0 else []
     #time_chart_axis_steps = get_views_steps(time_chart_data, ["active", "total"])
 
 
@@ -96,7 +99,9 @@ def tracking(request):
         #"views_chart_axis_steps": views_chart_axis_steps,
         #"time_chart_axis_steps": time_chart_axis_steps,
         "views_chart_data": views_chart_data,
-        "time_chart_data": time_chart_data
+        "time_chart_data": time_chart_data,
+        "to_days_ago": default_to_days_ago,
+        "from_days_ago": default_from_days_ago
         }
     return render_to_response("tracking.html", context, context_instance=RequestContext(request))
 
@@ -182,12 +187,30 @@ def get_sites(request):
             pixel_map = {pixel.unique_code: pixel for pixel in pixel_list}
             pixel_code_list = [pixel.unique_code for pixel in pixel_list]
             pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
+            to_days_ago = request.GET["to_days_ago"] if "to_days_ago" in request.GET else default_to_days_ago
+            from_days_ago = request.GET["from_days_ago"] if "from_days_ago" in request.GET else default_from_days_ago
+            to_date = date.today() - timedelta(days=int(to_days_ago))
+            from_date = date.today() - timedelta(days=int(from_days_ago))
 
-            query = "SELECT page_unique_code, median(coalesce(active_time, 0)) as active, median(EXTRACT(EPOCH from (coalesce(session_updated, created) - created))) AS total, count(session_id) as visits, count(DISTINCT local_user_id) as unique_visits \
-                        FROM page_sessions_link \
-                        WHERE os != 'NULL' AND browser  != 'NULL' AND page_unique_code in (%s) \
-                        GROUP BY page_unique_code \
-                        ORDER BY page_unique_code" % pixel_code_list_str
+            query = "\
+                SELECT page_unique_code,                                                                   \
+                       Median(Coalesce(active_time, 0))                                                    \
+                       AS active,                                                                          \
+                       Median(EXTRACT(epoch FROM ( Coalesce(session_updated, created) - created            \
+                                                 ))) AS                                                    \
+                       total,                                                                              \
+                       COUNT(session_id)                                                                   \
+                       AS visits,                                                                          \
+                       COUNT(DISTINCT local_user_id)                                                       \
+                       AS unique_visits                                                                    \
+                FROM   page_sessions_link                                                                  \
+                WHERE  os != 'NULL'                                                                        \
+                       AND browser != 'NULL'                                                               \
+                       AND page_unique_code IN ( %s )                                                      \
+                       AND created > '%s'                                                                  \
+                       AND created < '%s'                                                                  \
+                GROUP  BY page_unique_code                                                                 \
+                ORDER  BY page_unique_code " % (pixel_code_list_str, from_date, to_date)
 
             data = get_data_from_sql(query)
 
@@ -250,12 +273,14 @@ def get_sp_name(request):
 def get_views_data_request(request):
     site_id = request.GET["site_id"] if "site_id" in request.GET else None
     page_id = request.GET["page_id"] if "page_id" in request.GET else None
-    return get_views_data(site_id, page_id)
+    to_days_ago = request.GET["to_days_ago"] if "to_days_ago" in request.GET else default_to_days_ago
+    from_days_ago = request.GET["from_days_ago"] if "from_days_ago" in request.GET else default_from_days_ago
+    return get_views_data(site_id, page_id, to_days_ago, from_days_ago)
 
 #
-#   Получение данных показов (site_id, page_id)
+#   Получение данных показов (site_id, page_id, to_days_ago, from_days_ago)
 #
-def get_views_data(site_id, page_id):
+def get_views_data(site_id, page_id, to_days_ago, from_days_ago):
     result_data = []
     pixel_code_list = []
     if site_id is not None:
@@ -265,26 +290,31 @@ def get_views_data(site_id, page_id):
     else:
         pixel = UserPixel.objects.get(pk=page_id)
         pixel_code_list = [pixel.unique_code]
+    
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
-    query = "SELECT CURRENT_DATE - s.a AS date, \
-       COALESCE(visits, 0) as visits,  \
-       COALESCE(unique_visits, 0) as unique_visits \
-FROM   Generate_series(0, 30, 1) AS s(a) \
-       LEFT JOIN (SELECT Date(created)                 AS date, \
-                         Count(session_id)             AS visits, \
-                         Count(DISTINCT local_user_id) AS unique_visits \
-                  FROM   page_sessions_link  \
-                  WHERE  os != 'NULL'  \
-                         AND browser != 'NULL' \
-                         AND page_unique_code IN ( %s ) \
-                  GROUP  BY Date(created)  \
-                  ORDER  BY Date(created)) AS data_table \
-              ON CURRENT_DATE - s.a = data_table.date;" % pixel_code_list_str
+    query = "\
+        SELECT    CURRENT_DATE - s.a         AS date,                                     \
+                  COALESCE(visits, 0)        AS visits,                                   \
+                  COALESCE(unique_visits, 0) AS unique_visits                             \
+        FROM      Generate_series(%s, %s, -1) AS s(a)                                      \
+        LEFT JOIN                                                                         \
+                  (                                                                       \
+                           SELECT   Date(created)                 AS date,                \
+                                    Count(session_id)             AS visits,              \
+                                    Count(DISTINCT local_user_id) AS unique_visits        \
+                           FROM     page_sessions_link                                    \
+                           WHERE    os != 'NULL'                                          \
+                                    AND      browser != 'NULL'                            \
+                                    AND      page_unique_code IN ( %s )                   \
+                           GROUP BY date(created)                                         \
+                           ORDER BY date(created)) AS data_table                          \
+        ON        CURRENT_DATE - s.a = data_table.date;" % (str(from_days_ago), str(to_days_ago), pixel_code_list_str)                    
     data = get_data_from_sql(query)
 
     counter = 0
     for entry in data:
-        result_data.append({"id": counter, "views": entry["visits"], "reqs": entry["unique_visits"], "xAxis": str(entry["date"])})
+        #result_data.append({"id": counter, "views": entry["visits"], "reqs": entry["unique_visits"], "xAxis": str(entry["date"])})
+        result_data.append({"id": counter, "views": entry["visits"], "reqs": entry["unique_visits"], "xAxis": str(str(entry["date"]).split("-")[2])})
         counter += 1
     # return [{"views": entry["visits"], "reqs": entry["unique_visits"], "xAxis": idx} for idx, entry in data]
     return result_data
@@ -296,12 +326,14 @@ FROM   Generate_series(0, 30, 1) AS s(a) \
 def get_time_data_request(request):
     site_id = request.GET["site_id"] if "site_id" in request.GET else None
     page_id = request.GET["page_id"] if "page_id" in request.GET else None
-    return get_time_data(site_id, page_id)
+    to_days_ago = request.GET["to_days_ago"] if "to_days_ago" in request.GET else default_to_days_ago
+    from_days_ago = request.GET["from_days_ago"] if "from_days_ago" in request.GET else default_from_days_ago
+    return get_time_data(site_id, page_id, to_days_ago, from_days_ago)
 
 #
-#   Получение данных времени (site_id, page_id)
+#   Получение данных времени (site_id, page_id, to_days_ago, from_days_ago)
 #
-def get_time_data(site_id, page_id):
+def get_time_data(site_id, page_id, to_days_ago, from_days_ago):
     result_data = []
     pixel_code_list = []
     if site_id is not None:
@@ -312,27 +344,29 @@ def get_time_data(site_id, page_id):
         pixel = UserPixel.objects.get(pk=page_id)
         pixel_code_list = [pixel.unique_code]
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
-    query = "SELECT CURRENT_DATE - s.a AS date, \
-       COALESCE(active, 0) as active, \
-       COALESCE(total, 0) as total \
-FROM   Generate_series(0, 30, 1) AS s(a) \
-       LEFT JOIN (SELECT Date(created) AS date, \
-                         Median(COALESCE(active_time, 0)) AS active, \
-                         GREATEST(Median(Extract(epoch FROM ( COALESCE(session_updated, created) - created))),  Median(COALESCE(active_time, 0))) AS total \
-                  FROM   page_sessions_link  \
-                  WHERE  os != 'NULL'  \
-                         AND browser != 'NULL' \
-                         AND page_unique_code IN ( %s ) \
-                  GROUP  BY Date(created)  \
-                  ORDER  BY Date(created)) AS data_table \
-              ON CURRENT_DATE - s.a = data_table.date; " % pixel_code_list_str
-    print query
+    query = "\
+        SELECT    CURRENT_DATE - s.a         AS date,                                                                                                                               \
+                  COALESCE(active, 0)        AS active,                                                                                                                             \
+                  COALESCE(total, 0)         AS total                                                                                                                               \
+        FROM      Generate_series(%s, %s, -1) AS s(a)                                                                                                                                \
+        LEFT JOIN                                                                                                                                                                   \
+                  (                                                                                                                                                                 \
+                           SELECT   Date(created)                                                                                                           AS date,                \
+                                    Median(COALESCE(active_time, 0))                                                                                        AS active,              \
+                                    Greatest(Median(Extract(epoch FROM ( COALESCE(session_updated, created) - created))), Median(COALESCE(active_time, 0))) AS total                \
+                           FROM     page_sessions_link                                                                                                                              \
+                           WHERE    os != 'NULL'                                                                                                                                    \
+                                    AND      browser != 'NULL'                                                                                                                      \
+                                    AND      page_unique_code IN ( %s )                                                                                                             \
+                           GROUP BY date(created)                                                                                                                                   \
+                           ORDER BY date(created)) AS data_table                                                                                                                    \
+        ON        CURRENT_DATE - s.a = data_table.date;" % (str(from_days_ago), str(to_days_ago), pixel_code_list_str)  
     data = get_data_from_sql(query)
 
     counter = 0
     for entry in data:
-        # result_data.append({"active": entry["active"], "total": entry["total"], "xAxis": str(entry["date"])})
-        result_data.append({"id": counter, "active": int(entry["active"]) + 1, "total": int(entry["total"]) + 1, "xAxis": str(entry["date"])})
+        #result_data.append({"active": entry["active"], "total": entry["total"], "xAxis": str(entry["date"])})
+        result_data.append({"id": counter, "active": int(entry["active"]), "total": int(entry["total"]), "xAxis": str(str(entry["date"]).split("-")[2])})
         counter += 1
     # return [{"active": entry["active"], "total": entry["total"], "xAxis": idx} for idx, entry in data]
     return result_data

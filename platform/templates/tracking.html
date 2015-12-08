@@ -7,6 +7,10 @@
     <!-- webix.css -->
     <link href="/static/libs/webix/codebase/webix.css" rel="stylesheet" type="text/css" >
 
+    <!-- Date Range Picker -->
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
 	<!-- tracking.css -->
     <link href="/static/css/tracking.css" rel="stylesheet" type="text/css" >
 
@@ -21,6 +25,11 @@
 
 	<!-- jQuery -->
 	<script src="/static/libs/jquery-2.1.4.min.js"></script>
+    
+    <!-- Date Range Picker -->
+    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
 
 	<!-- tracking.js -->
     <script src="/static/js/tracking.js"></script>
@@ -67,17 +76,32 @@ var contentData = {
 
 
 {% block menu %}<div class="tracking-menu-inner-div" id="leftMenuContainerInner"></div>{% endblock %}
-{% block content %}<div class="tracking-content-inner-div" id="contentContainerInner"></div>{% endblock %}
+
+{% block content %}
+    <div class="tracking-content-top-inner-div" id="contentContainerInnerTop">
+        <div class="tracking-content-top-inner-div-calendar" id="contentContainerInnerTopCalendar">
+            <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; width: auto">
+                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                <span></span> <b class="caret"></b>
+            </div>
+        </div>
+        <div class="tracking-content-top-inner-div-webix" id="contentContainerInnerTopWebix"></div>
+    </div>
+    <div class="tracking-content-inner-div" id="contentContainerInner"></div>
+{% endblock %}
 
 
 
-{% block webix_code %}
+{% block js_code %}
 
 		var preloaderDelay = 20000;
 
 		var currentSPID = contentData.trackTreetableData[0]["spID"];
 		var currentSPKey = getSPQueryKey(contentData.trackTreetableData[0]["id"]);
 		var currentName = contentData.trackTreetableData[0]["value"];
+
+        var toDaysAgo = {{ to_days_ago|safe }};
+        var fromDaysAgo = {{ from_days_ago|safe }};
 
 		//Старт вебикса
 		webix.ready(function () {
@@ -86,9 +110,13 @@ var contentData = {
 
 			contentData["viewLabelText"] = "Количество посещений " + "«" + currentName + "»";
 			contentData["timeLabelText"] = "Средняя длительность посещений " + "«" + currentName + "»" + " (сек.)";
-			buildContent(contentData, "contentContainerInner", dateClick, refreshClick, treetableClick);
+			buildContentTop(0, "contentContainerInnerTopWebix", refreshClick);
+            buildContentBase(contentData, "contentContainerInner", treetableClick);
 			$$("trackTreetableID").select(1);
 		});
+
+        //Добавляем календарь
+        buildCalendar("#reportrange", dateClick, fromDaysAgo, toDaysAgo)
 
 		//Обработка нажатия на меню слева
 		function leftMenuClick(itemID) {
@@ -96,8 +124,10 @@ var contentData = {
 		}
 
 		//Обработка нажатия на выбор даты
-		function dateClick(selectedDate) {
-
+		function dateClick(start, end) {
+            toDaysAgo = moment().diff(end.startOf('day'), "days");
+            fromDaysAgo = moment().diff(start.startOf('day'), "days");
+            refreshClick();
 		}
 
 		//Обработка кнопки "обновить"
@@ -164,6 +194,8 @@ var contentData = {
 			var reqData = {};
 				reqData["command"] = "get_refresh_data";
 				reqData[currentSPKey] = currentSPID;
+                reqData["to_days_ago"] = toDaysAgo;
+                reqData["from_days_ago"] = fromDaysAgo;
 			$.ajax({
 				url: "/platform/tracking_ajax/",
 				type: "get",

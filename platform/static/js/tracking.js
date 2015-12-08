@@ -1,12 +1,69 @@
-function buildContent(data, containerID, dateCallback, refreshCallback, treetableCallback) {
+function buildCalendar(container, dateCallback, fromDaysAgo, toDaysAgo) {
 
-	//  Тулбар
-	var dtToolbar = {
-		view: "toolbar",
-		id: "dtToolbarID",
-		width: 880,
-		css: "webix-ui-dttoolbar",
-		cols: [{},/*{
+    function cb(start, end) {
+        $(container + ' span').html(start.format('DD.MM.YY') + ' - ' + end.format('DD.MM.YY'));
+        dateCallback(start, end);
+    }
+    
+    $(container).daterangepicker({
+        locale: {
+            "format": "DD.MM.YYYY",
+            "separator": " - ",
+            "applyLabel": "Применить",
+            "cancelLabel": "Отмена",
+            "fromLabel": "С",
+            "toLabel": "по",
+            "customRangeLabel": "Выбрать диапазон",
+            "daysOfWeek": [
+                "вс",
+                "пн",
+                "вт",
+                "ср",
+                "чт",
+                "пт",
+                "сб"
+            ],
+            "monthNames": [
+                "Январь",
+                "Февраль",
+                "Март",
+                "Апрель",
+                "Май",
+                "Июнь",
+                "Июль",
+                "Август",
+                "Сентябрь",
+                "Октябрь",
+                "Ноябрь",
+                "Декабрь"
+            ],
+            "firstDay": 1
+        },
+        ranges: {
+            'Сегодня': [moment(), moment()],
+            'Вчера': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'Последние 7 дней': [moment().subtract(6, 'days'), moment()],
+            'Последние 30 дней': [moment().subtract(29, 'days'), moment()],
+            'Текущий месяц': [moment().startOf('month'), moment()],
+            'Предыдущий месяц': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+        },
+        linkedCalendars: true,
+        startDate: moment(),
+        endDate: moment(),
+        opens: "right"
+    }, cb);
+
+    $(container + ' span').html(moment().subtract(fromDaysAgo, 'days').format('DD.MM.YY') + ' - ' + moment().subtract(toDaysAgo, 'days').format('DD.MM.YY'));
+}
+
+function buildContentTop(data, containerID, refreshCallback) {
+    //  Тулбар
+    var dtToolbar = {
+        view: "toolbar",
+        id: "dtToolbarID",
+        width: 880,
+        css: "webix-ui-dttoolbar",
+        cols: [{},/*{
 			view: "combo",
 			id: "dtCombo",
 			label: "Период",
@@ -39,16 +96,27 @@ function buildContent(data, containerID, dateCallback, refreshCallback, treetabl
 			align: "right",
 			click: function() {alert()}
 		}, */{
-			view: "button",
-			type: "iconButton",
-			icon: "refresh",
-			label: "Обновить",
-			width: 120,
-			align: "right",
-			click: refreshCallback
+		    view: "button",
+		    type: "iconButton",
+		    icon: "refresh",
+		    label: "Обновить",
+		    width: 120,
+		    align: "right",
+		    click: refreshCallback
 		}]
 
-	}
+    }
+
+    webix.ui({
+        css: "wbx",
+        container: containerID,
+        rows: [
+			dtToolbar
+        ]
+    });
+}
+
+function buildContentBase(data, containerID, treetableCallback) {
 
 	//  Таблица трекинга
 	var trackTreetable = {
@@ -243,8 +311,6 @@ function buildContent(data, containerID, dateCallback, refreshCallback, treetabl
 		css: "wbx",
 		container: containerID,
 		rows: [
-			dtToolbar,
-			{ height: 22},
 			trackTreetable,
 			{ height: 40 },
 			{view: "toolbar", id: "viewToolbarID", height: 40, elements : [{ view:"label", id: "viewToolbarLabelID", css:".webix_ui_label_toolbar", label: data.viewLabelText}]},
