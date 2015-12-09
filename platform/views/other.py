@@ -207,11 +207,11 @@ def get_sites(request):
                 WHERE  os != 'NULL'                                                                        \
                        AND browser != 'NULL'                                                               \
                        AND page_unique_code IN ( %s )                                                      \
-                       AND created > '%s'                                                                  \
-                       AND created < '%s'                                                                  \
+                       AND created >= '%s'                                                                 \
+                       AND created <= '%s'                                                                 \
                 GROUP  BY page_unique_code                                                                 \
-                ORDER  BY page_unique_code " % (pixel_code_list_str, from_date, to_date)
-
+                ORDER  BY page_unique_code " % (pixel_code_list_str, str(from_date) + " 00:00:00", str(to_date) + " 23:59:59")
+            print(query)
             data = get_data_from_sql(query)
 
             pixel_counter = 1
@@ -308,7 +308,7 @@ def get_views_data(site_id, page_id, to_days_ago, from_days_ago):
         SELECT    CURRENT_DATE - s.a         AS date,                                     \
                   COALESCE(visits, 0)        AS visits,                                   \
                   COALESCE(unique_visits, 0) AS unique_visits                             \
-        FROM      Generate_series(%s, %s, -1) AS s(a)                                      \
+        FROM      Generate_series(%s, %s, -1) AS s(a)                                     \
         LEFT JOIN                                                                         \
                   (                                                                       \
                            SELECT   Date(created)                 AS date,                \
@@ -364,7 +364,7 @@ def get_time_data(site_id, page_id, to_days_ago, from_days_ago):
         SELECT    CURRENT_DATE - s.a         AS date,                                                                                                                               \
                   COALESCE(active, 0)        AS active,                                                                                                                             \
                   COALESCE(total, 0)         AS total                                                                                                                               \
-        FROM      Generate_series(%s, %s, -1) AS s(a)                                                                                                                                \
+        FROM      Generate_series(%s, %s, -1) AS s(a)                                                                                                                               \
         LEFT JOIN                                                                                                                                                                   \
                   (                                                                                                                                                                 \
                            SELECT   Date(created)                                                                                                           AS date,                \
