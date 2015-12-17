@@ -55,21 +55,9 @@ var menuData = {
 
 };
 
-var spIDData = {{ sp_id_data|safe }}
-
 var contentData = {
 
-	"toolbarDates": {{ toolbar_dates|safe }},
-
-	"trackTreetableData": {{ treetable_data|safe }},
-
-	"visitChartData": {{ views_chart_data|safe }},
-	"visitChartLegendData": [{text:"Общее число посещений",color:"#a7ee70"},{text:"Уникальные поситители",color:"#36abee"}],
-	//"visitChartYAxis":{{ views_chart_axis_steps|safe }},
-
-	"timeChartData": {{ time_chart_data|safe }},
-	"timeChartLegendData": [{text:"Среднее время на сайте",color:"#a7ee70"},{text:"Среднее время активности",color:"#36abee"}],
-	//"timeChartYAxis": {{ time_chart_axis_steps|safe }},
+	"pubTreetableData": {{ treetable_data|safe }}
 
 };
 
