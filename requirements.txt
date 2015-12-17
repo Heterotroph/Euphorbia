@@ -1,2 +1,4 @@
 Django==1.8.4
 Pillow
+python-geoip==1.2
+python-geoip-geolite2==2015.303
