@@ -11,7 +11,7 @@ def get_publisher_stats(user, from_date, to_date):
 
 
     date_diff = (to_date-from_date)/(3600*24)
-    query = "select CURRENT_DATE - s.a AS date, pa.site_id as site_id, count(bss) as shows, count(bc) as clicks \
+    query = "select to_timestamp(%d) - s.a AS date, pa.site_id as site_id, count(bss) as shows, count(bc) as clicks \
             from Generate_series(%d, 0, -1) AS s(a) \
             inner join  \
             platform_adspot as pa \
@@ -23,7 +23,7 @@ def get_publisher_stats(user, from_date, to_date):
             banner_clicks as bc \
             on bc.spot_code = pa.unique_code and date(bss.created)=CURRENT_DATE - s.a \
             where pa.site_id in (%s) \
-            group by pa.site_id,CURRENT_DATE - s.a;" % (date_diff, site_id_list_str)
+            group by pa.site_id,CURRENT_DATE - s.a;" % (to_date, date_diff, site_id_list_str)
 
     data = get_data_from_sql(query)
     for entry in data:
