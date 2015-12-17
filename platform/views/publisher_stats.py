@@ -1,4 +1,4 @@
-﻿from platform.models import UserSite, AdSpot
+﻿from platform.models import UserSite, AdSpot, Campaign
 from platform.views.other import get_data_from_sql
 from other import get_menu, get_menu_links, default_from_date, default_to_date
 from django.shortcuts import render_to_response
@@ -52,6 +52,39 @@ def get_publisher_stats(user, from_date, to_date):
             if site.id == entry['site_id']:
                 entry["date"] = str(entry["date"])
                 entry['site_name'] = site.name
+                break
+
+    return data
+
+
+
+def get_advertiser_stats(user, from_date, to_date):
+    campaigns_list = Campaign.objects.filter(user=user)
+    campaign_id_list = [str(site.id) for site in campaigns_list]
+    campaign_id_list_str = ",".join(campaign_id_list)
+
+
+    date_diff = (to_date-from_date)/(3600*24)
+    query = "select dt.date, pb.campaign_id as campaign_id, count(bss) as shows, count(bc) as clicks from \
+            (select timestamp(%d)::date - s.a AS date from Generate_series(%d, 0, -1) AS s(a)) as dt \
+            inner join \
+            platform_banner as pb \
+            on 1=1 \
+            left join \
+            banner_show_stats as bss \
+            on bss.banner_id = pb.id and date(bss.created)=dt.date \
+            left join \
+            banner_clicks as bc \
+            on bc.banner_id = pb.id and date(bss.created)=dt.date \
+            where pb.campaign_id in (%s) \
+            group by pb.campaign_id,dt.date;" % (to_date, date_diff, campaign_id_list_str)
+
+    data = get_data_from_sql(query)
+    for entry in data:
+        for campaign in campaigns_list:
+            if campaign.id == entry['campaign_id']:
+                entry["date"] = str(entry["date"])
+                entry['campaign_name'] = campaign.name
                 break
 
     return data
