@@ -28,6 +28,7 @@ max_xAxis_len = 40
 
 default_to_date = to_unixtime(datetime.now() - timedelta(days=int(default_to_days_ago)))
 default_from_date = to_unixtime(datetime.now() - timedelta(days=int(default_from_days_ago)))
+print default_to_date, default_from_date
 
 
 #
@@ -111,8 +112,8 @@ def tracking(request):
         #"time_chart_axis_steps": time_chart_axis_steps,
         "views_chart_data": views_chart_data,
         "time_chart_data": time_chart_data,
-        "to_days_ago": default_to_days_ago,
-        "from_days_ago": default_from_days_ago
+        "to_date": default_to_date,
+        "from_date": default_from_date
         }
     return render_to_response("tracking.html", context, context_instance=RequestContext(request))
 
@@ -199,8 +200,8 @@ def get_sites(request):
             pixel_map = {pixel.unique_code: pixel for pixel in pixel_list}
             pixel_code_list = [pixel.unique_code for pixel in pixel_list]
             pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
-            from_date = request.GET["from_date"] if "from_date" in request.GET else default_from_date
-            to_date = request.GET["to_date"] if "to_date" in request.GET else default_to_date
+            from_date = int(request.GET["from_date"]) if "from_date" in request.GET else default_from_date
+            to_date = int(request.GET["to_date"]) if "to_date" in request.GET else default_to_date
 
 
             query = "\
@@ -290,8 +291,8 @@ def get_sp_name(request):
 def get_views_data_request(request):
     site_id = request.GET["site_id"] if "site_id" in request.GET else None
     page_id = request.GET["page_id"] if "page_id" in request.GET else None
-    from_date = request.GET["from_date"] if "from_date" in request.GET else default_from_date
-    to_date = request.GET["to_date"] if "to_date" in request.GET else default_to_date
+    from_date = int(request.GET["from_date"]) if "from_date" in request.GET else default_from_date
+    to_date = int(request.GET["to_date"]) if "to_date" in request.GET else default_to_date
     return get_views_data(site_id, page_id, from_date, to_date)
 
 #
@@ -348,8 +349,8 @@ def get_views_data(site_id, page_id, from_date, to_date):
 def get_time_data_request(request):
     site_id = request.GET["site_id"] if "site_id" in request.GET else None
     page_id = request.GET["page_id"] if "page_id" in request.GET else None
-    from_date = request.GET["from_date"] if "from_date" in request.GET else default_from_date
-    to_date = request.GET["to_date"] if "to_date" in request.GET else default_to_date
+    from_date = int(request.GET["from_date"]) if "from_date" in request.GET else default_from_date
+    to_date = int(request.GET["to_date"]) if "to_date" in request.GET else default_to_date
     return get_time_data(site_id, page_id, from_date, to_date)
 
 #

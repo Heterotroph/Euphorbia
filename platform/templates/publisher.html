@@ -1,0 +1,100 @@
+﻿{% extends "ui-base.html" %}
+{% block title %}Трекинг{% endblock %}
+
+
+{% block css %}
+<!-- webix.css -->
+<link href="/static/libs/webix/codebase/webix.css" rel="stylesheet" type="text/css">
+
+<!-- Date Range Picker -->
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap/latest/css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.css" />
+
+<!-- tracking.css -->
+<link href="/static/css/tracking.css" rel="stylesheet" type="text/css">
+
+<!--left-menu.css-->
+<link href="/static/css/left-menu.css" rel="stylesheet" type="text/css">
+
+{% endblock %}
+
+
+{% block js %}
+
+<!-- jQuery -->
+<script src="/static/libs/jquery-2.1.4.min.js"></script>
+
+<!-- Date Range Picker -->
+<script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1/jquery.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/bootstrap.daterangepicker/2/daterangepicker.js"></script>
+
+<!-- tracking.js -->
+<script src="/static/js/tracking.js"></script>
+
+<!-- build_tracking_webix_ui.js -->
+<script src="/static/js/build_tracking_webix_ui.js"></script>
+
+<!-- left_menu.js -->
+<script src="/static/js/left_menu.js"></script>
+
+<!-- build_calendar.js -->
+<script src="/static/js/build_calendar.js"></script>
+
+<!-- Webix JS Core -->
+<script src="/static/libs/webix/codebase/webix.js"></script>
+
+{% endblock %}
+
+{% block webix_data %}
+
+var menuData = {
+
+	"leftMenuData": {{ left_menu_data|safe }},
+	"leftMenuLinks": {{ left_menu_links|safe }}
+
+};
+
+var spIDData = {{ sp_id_data|safe }}
+
+var contentData = {
+
+	"toolbarDates": {{ toolbar_dates|safe }},
+
+	"trackTreetableData": {{ treetable_data|safe }},
+
+	"visitChartData": {{ views_chart_data|safe }},
+	"visitChartLegendData": [{text:"Общее число посещений",color:"#a7ee70"},{text:"Уникальные поситители",color:"#36abee"}],
+	//"visitChartYAxis":{{ views_chart_axis_steps|safe }},
+
+	"timeChartData": {{ time_chart_data|safe }},
+	"timeChartLegendData": [{text:"Среднее время на сайте",color:"#a7ee70"},{text:"Среднее время активности",color:"#36abee"}],
+	//"timeChartYAxis": {{ time_chart_axis_steps|safe }},
+
+};
+
+{% endblock %}
+
+
+{% block menu %}<div class="tracking-menu-inner-div" id="leftMenuContainerInner"></div>{% endblock %}
+
+
+{% block content %}
+<div class="tracking-content-top-inner-div" id="contentContainerInnerTop">
+    <div class="tracking-content-top-inner-div-calendar" id="contentContainerInnerTopCalendar">
+        <div id="reportrange" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; border-radius: 5px; width: auto">
+            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+            <span></span> <b class="caret"></b>
+        </div>
+    </div>
+    <div class="tracking-content-top-inner-div-webix" id="contentContainerInnerTopWebix"></div>
+</div>
+<div class="tracking-content-inner-div" id="contentContainerInner"></div>
+{% endblock %}
+
+
+{% block js_code %}
+
+    tracking({{ from_date|safe }}, {{ to_date|safe }});
+
+{% endblock %}

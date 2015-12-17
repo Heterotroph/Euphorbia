@@ -109,8 +109,8 @@ function tracking(sUNIXTime, eUNIXTime) {
         var reqData = {};
         reqData["command"] = "get_refresh_data";
         reqData[currentSPKey] = currentSPID;
-        reqData["to_date"] = eUNIXTime;
-        reqData["from_date"] = sUNIXTime;
+        reqData["from_date"] = eUNIXTime;
+        reqData["to_date"] = sUNIXTime;
         $.ajax({
             url: "/platform/tracking_ajax/",
             type: "get",
@@ -144,8 +144,8 @@ function tracking(sUNIXTime, eUNIXTime) {
         var reqData = {};
         reqData["command"] = "get_data_by_sp_id";
         reqData[spKey] = spID;
-        reqData["to_date"] = eUNIXTime;
-        reqData["from_date"] = sUNIXTime;
+        reqData["from_date"] = eUNIXTime;
+        reqData["to_date"] = sUNIXTime;
 
         $.ajax({
             url: "/platform/tracking_ajax/",
