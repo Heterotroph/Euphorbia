@@ -1,4 +1,4 @@
-function tracking(fromDaysAgo, toDaysAgo) {
+function tracking(sUNIXTime, eUNIXTime) {
 
     //Длительность прелоадера
     var preloaderDelay = 30000;
@@ -24,7 +24,7 @@ function tracking(fromDaysAgo, toDaysAgo) {
     });
 
     //Добавляем календарь
-    buildCalendar("#reportrange", dateClick, fromDaysAgo, toDaysAgo)
+    buildCalendar("#reportrange", dateClick, sUNIXTime, eUNIXTime)
 
     //Обработка нажатия на меню слева
     function leftMenuClick(itemID) {
@@ -33,9 +33,9 @@ function tracking(fromDaysAgo, toDaysAgo) {
 
     //Обработка нажатия на выбор даты
     function dateClick(start, end) {
-        toDaysAgo = moment().diff(end.startOf('day'), "days");
-        fromDaysAgo = moment().diff(start.startOf('day'), "days");
-        if (fromDaysAgo - toDaysAgo + 1 <= 60) {
+        sUNIXTime = end.unix();
+        eUNIXTime = start.unix();
+        if (end.diff(start.startOf('day'), "days") + 1 <= 60) {
             refreshClick();
         } else {
             webix.alert("Количество дней между датами должно быть не более 60.<br />Сократите диапазон.");
@@ -109,8 +109,8 @@ function tracking(fromDaysAgo, toDaysAgo) {
         var reqData = {};
         reqData["command"] = "get_refresh_data";
         reqData[currentSPKey] = currentSPID;
-        reqData["to_days_ago"] = toDaysAgo;
-        reqData["from_days_ago"] = fromDaysAgo;
+        reqData["to_date"] = eUNIXTime;
+        reqData["from_date"] = sUNIXTime;
         $.ajax({
             url: "/platform/tracking_ajax/",
             type: "get",
@@ -144,8 +144,8 @@ function tracking(fromDaysAgo, toDaysAgo) {
         var reqData = {};
         reqData["command"] = "get_data_by_sp_id";
         reqData[spKey] = spID;
-        reqData["to_days_ago"] = toDaysAgo;
-        reqData["from_days_ago"] = fromDaysAgo;
+        reqData["to_date"] = eUNIXTime;
+        reqData["from_date"] = sUNIXTime;
 
         $.ajax({
             url: "/platform/tracking_ajax/",

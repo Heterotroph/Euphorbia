@@ -1,4 +1,4 @@
-﻿function buildCalendar(container, dateCallback, fromDaysAgo, toDaysAgo) {
+﻿function buildCalendar(container, dateCallback, sUNIXTime, eUNIXTime) {
 
     function cb(start, end) {
         $(container + ' span').html(start.format('DD.MM.YY') + ' - ' + end.format('DD.MM.YY'));
@@ -48,13 +48,13 @@
             'Предыдущий месяц': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
         },
         linkedCalendars: true,
-        startDate: moment().subtract(fromDaysAgo, 'days'),
-        endDate: moment().subtract(toDaysAgo, 'days'),
+        startDate: moment(sUNIXTime),
+        endDate: moment(eUNIXTime),
         opens: "right",
         isInvalidDate: function(value){
             return value > moment() || value < moment().subtract(12, 'month');
         }
     }, cb);
 
-    $(container + ' span').html(moment().subtract(fromDaysAgo, 'days').format('DD.MM.YY') + ' - ' + moment().subtract(toDaysAgo, 'days').format('DD.MM.YY'));
+    $(container + ' span').html(moment(sUNIXTime).format('DD.MM.YY') + ' - ' + moment(eUNIXTime).format('DD.MM.YY'));
 }
