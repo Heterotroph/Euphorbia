@@ -1,20 +1,17 @@
 # -*- coding: utf-8 -*-
 import json
-from time import mktime
 from django.contrib.auth import logout
 
 from django.db import connection
-from django.shortcuts import render
 
 
 # Create your views here.
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.template import RequestContext
-from django.template.backends import django
 from platform.models import UserSite, UserPixel
-from datetime import date, timedelta, datetime
+from datetime import timedelta, datetime
 
 def to_unixtime(dt):
     timestamp = (dt - datetime(1970, 1, 1)).total_seconds()
@@ -310,7 +307,7 @@ def get_views_data(site_id, page_id, from_date, to_date):
         pixel_code_list = [pixel.unique_code]
 
     date_diff = (to_date-from_date)/(3600*24)
-    
+
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
     query = "\
         SELECT    to_timestamp(%s)::date - s.a         AS date,                                     \
