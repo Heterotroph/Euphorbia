@@ -85,7 +85,7 @@ DATABASES = {
         #'USER': 'django',
         'PASSWORD': 'password',
         #'PASSWORD': 'ooFxfq111',
-        'HOST': 'px.adbox.kz',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+        'HOST': 'euphorbia.co',  # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
         'PORT': '5445',  # Set to empty string for default.
     }
 }

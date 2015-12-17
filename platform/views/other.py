@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
+from time import mktime
 from django.contrib.auth import logout
 
 from django.db import connection
@@ -13,12 +14,21 @@ from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.template import RequestContext
 from django.template.backends import django
 from platform.models import UserSite, UserPixel
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+
+def to_unixtime(dt):
+    timestamp = (dt - datetime(1970, 1, 1)).total_seconds()
+    return int(timestamp)
+
 
 
 default_from_days_ago = 29
 default_to_days_ago = 0
 max_xAxis_len = 40
+
+default_to_date = to_unixtime(datetime.now() - timedelta(days=int(default_to_days_ago)))
+default_from_date = to_unixtime(datetime.now() - timedelta(days=int(default_from_days_ago)))
+
 
 #
 #   -||-||-||-||-||-
@@ -189,12 +199,9 @@ def get_sites(request):
             pixel_map = {pixel.unique_code: pixel for pixel in pixel_list}
             pixel_code_list = [pixel.unique_code for pixel in pixel_list]
             pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
-            to_days_ago = request.GET["to_days_ago"] if "to_days_ago" in request.GET else default_to_days_ago
-            from_days_ago = request.GET["from_days_ago"] if "from_days_ago" in request.GET else default_from_days_ago
-            to_days_ago = to_days_ago if int(to_days_ago) >= 0 else "0"
-            from_days_ago = from_days_ago if int(from_days_ago) >= 0 else "0"
-            to_date = date.today() - timedelta(days=int(to_days_ago))
-            from_date = date.today() - timedelta(days=int(from_days_ago))
+            from_date = request.GET["from_date"] if "from_date" in request.GET else default_from_date
+            to_date = request.GET["to_date"] if "to_date" in request.GET else default_to_date
+
 
             query = "\
                 SELECT page_unique_code,                                                                   \
@@ -207,10 +214,10 @@ def get_sites(request):
                 WHERE  os != 'NULL'                                                                        \
                        AND browser != 'NULL'                                                               \
                        AND page_unique_code IN ( %s )                                                      \
-                       AND created >= '%s'                                                                 \
-                       AND created <= '%s'                                                                 \
+                       AND created >= to_timestamp(%s)  AT TIME ZONE 'UTC'                                                               \
+                       AND created <= to_timestamp(%s)  AT TIME ZONE 'UTC'                                                              \
                 GROUP  BY page_unique_code                                                                 \
-                ORDER  BY page_unique_code " % (pixel_code_list_str, str(from_date) + " 00:00:00", str(to_date) + " 23:59:59")
+                ORDER  BY page_unique_code " % (pixel_code_list_str, str(from_date), str(to_date))
             print(query)
             data = get_data_from_sql(query)
 
@@ -283,16 +290,14 @@ def get_sp_name(request):
 def get_views_data_request(request):
     site_id = request.GET["site_id"] if "site_id" in request.GET else None
     page_id = request.GET["page_id"] if "page_id" in request.GET else None
-    to_days_ago = request.GET["to_days_ago"] if "to_days_ago" in request.GET else default_to_days_ago
-    from_days_ago = request.GET["from_days_ago"] if "from_days_ago" in request.GET else default_from_days_ago
-    to_days_ago = to_days_ago if int(to_days_ago) >= 0 else "0"
-    from_days_ago = from_days_ago if int(from_days_ago) >= 0 else "0"
-    return get_views_data(site_id, page_id, to_days_ago, from_days_ago)
+    from_date = request.GET["from_date"] if "from_date" in request.GET else default_from_date
+    to_date = request.GET["to_date"] if "to_date" in request.GET else default_to_date
+    return get_views_data(site_id, page_id, from_date, to_date)
 
 #
 #   Получение данных показов (site_id, page_id, to_days_ago, from_days_ago)
 #
-def get_views_data(site_id, page_id, to_days_ago, from_days_ago):
+def get_views_data(site_id, page_id, from_date, to_date):
     result_data = []
     pixel_code_list = []
     if site_id is not None:
@@ -302,13 +307,15 @@ def get_views_data(site_id, page_id, to_days_ago, from_days_ago):
     else:
         pixel = UserPixel.objects.get(pk=page_id)
         pixel_code_list = [pixel.unique_code]
+
+    date_diff = (to_date-from_date)/(3600*24)
     
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
     query = "\
-        SELECT    CURRENT_DATE - s.a         AS date,                                     \
+        SELECT    to_timestamp(%s)::date - s.a         AS date,                                     \
                   COALESCE(visits, 0)        AS visits,                                   \
                   COALESCE(unique_visits, 0) AS unique_visits                             \
-        FROM      Generate_series(%s, %s, -1) AS s(a)                                     \
+        FROM      Generate_series(%s, 0, -1) AS s(a)                                     \
         LEFT JOIN                                                                         \
                   (                                                                       \
                            SELECT   Date(created)                 AS date,                \
@@ -320,7 +327,8 @@ def get_views_data(site_id, page_id, to_days_ago, from_days_ago):
                                     AND      page_unique_code IN ( %s )                   \
                            GROUP BY date(created)                                         \
                            ORDER BY date(created)) AS data_table                          \
-        ON        CURRENT_DATE - s.a = data_table.date;" % (str(from_days_ago), str(to_days_ago), pixel_code_list_str)                    
+        ON        CURRENT_DATE - s.a = data_table.date;" % (str(to_date),date_diff, pixel_code_list_str)
+    print query
     data = get_data_from_sql(query)
 
     counter = 0
@@ -340,16 +348,14 @@ def get_views_data(site_id, page_id, to_days_ago, from_days_ago):
 def get_time_data_request(request):
     site_id = request.GET["site_id"] if "site_id" in request.GET else None
     page_id = request.GET["page_id"] if "page_id" in request.GET else None
-    to_days_ago = request.GET["to_days_ago"] if "to_days_ago" in request.GET else default_to_days_ago
-    from_days_ago = request.GET["from_days_ago"] if "from_days_ago" in request.GET else default_from_days_ago
-    to_days_ago = to_days_ago if int(to_days_ago) >= 0 else "0"
-    from_days_ago = from_days_ago if int(from_days_ago) >= 0 else "0"
-    return get_time_data(site_id, page_id, to_days_ago, from_days_ago)
+    from_date = request.GET["from_date"] if "from_date" in request.GET else default_from_date
+    to_date = request.GET["to_date"] if "to_date" in request.GET else default_to_date
+    return get_time_data(site_id, page_id, from_date, to_date)
 
 #
 #   Получение данных времени (site_id, page_id, to_days_ago, from_days_ago)
 #
-def get_time_data(site_id, page_id, to_days_ago, from_days_ago):
+def get_time_data(site_id, page_id, from_date, to_date):
     result_data = []
     pixel_code_list = []
     if site_id is not None:
@@ -360,11 +366,14 @@ def get_time_data(site_id, page_id, to_days_ago, from_days_ago):
         pixel = UserPixel.objects.get(pk=page_id)
         pixel_code_list = [pixel.unique_code]
     pixel_code_list_str = "'%s'" % ("', '".join(pixel_code_list))
+
+    date_diff = (to_date-from_date)/(3600*24)
+
     query = "\
-        SELECT    CURRENT_DATE - s.a         AS date,                                                                                                                               \
+        SELECT    to_timestamp(%s)::date - s.a   AS date,                                                                                                                               \
                   COALESCE(active, 0)        AS active,                                                                                                                             \
                   COALESCE(total, 0)         AS total                                                                                                                               \
-        FROM      Generate_series(%s, %s, -1) AS s(a)                                                                                                                               \
+        FROM      Generate_series(%s, 0, -1) AS s(a)                                                                                                                               \
         LEFT JOIN                                                                                                                                                                   \
                   (                                                                                                                                                                 \
                            SELECT   Date(created)                                                                                                           AS date,                \
@@ -376,7 +385,7 @@ def get_time_data(site_id, page_id, to_days_ago, from_days_ago):
                                     AND      page_unique_code IN ( %s )                                                                                                             \
                            GROUP BY date(created)                                                                                                                                   \
                            ORDER BY date(created)) AS data_table                                                                                                                    \
-        ON        CURRENT_DATE - s.a = data_table.date;" % (str(from_days_ago), str(to_days_ago), pixel_code_list_str)  
+        ON        CURRENT_DATE - s.a = data_table.date;" % (str(to_date), str(date_diff), pixel_code_list_str)
     data = get_data_from_sql(query)
 
     counter = 0
@@ -481,3 +490,5 @@ def time_presentation(seconds, prefix0="", prefix1=""):
         return "{:2.0f}".format(seconds) + prefix0
     else:
         return to_hms(seconds) + prefix1
+
+
