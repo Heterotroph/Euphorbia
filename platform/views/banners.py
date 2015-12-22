@@ -77,7 +77,7 @@ class BannerForm(forms.ModelForm):
            elif self.cleaned_data["format"].id == 2:
                 req_width = 300
                 req_height = 250
-            elif self.cleaned_data["format"].id == 3:
+           elif self.cleaned_data["format"].id == 3:
                 req_width = 400
                 req_height = 200
            w, h = get_image_dimensions(image)
